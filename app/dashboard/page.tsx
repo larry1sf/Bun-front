@@ -4,9 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { HOST_SERVER } from "../const";
 import { Sidebar, SidebarItem } from '@/components/shared/Sidebar';
-import { Background } from '@/components/ui/Background';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+
 
 export default function Dashboard() {
     const [isSidebarOpen, setSidebarOpen] = useState(true);
@@ -27,8 +25,7 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="flex min-h-screen font-['Inter',sans-serif] text-slate-200 selection:bg-blue-500/30">
-            <Background />
+        <>
 
             <Sidebar
                 isOpen={isSidebarOpen}
@@ -37,17 +34,12 @@ export default function Dashboard() {
                 userName="Larry Dev"
                 userPlan="Plan Premium"
             >
-                <SidebarItem icon="📊" label="Panel de Control" active isOpen={isSidebarOpen} />
-                {/* <SidebarItem icon="📈" label="Analíticas" isOpen={isSidebarOpen} />
-                <SidebarItem icon="💰" label="Transacciones" isOpen={isSidebarOpen} />
-                <SidebarItem icon="👥" label="Clientes" isOpen={isSidebarOpen} />
-                <SidebarItem icon="⚙️" label="Configuración" isOpen={isSidebarOpen} /> */}
             </Sidebar>
 
             {/* Main Content */}
-            <main className="flex-1 flex flex-col relative overflow-hidden h-screen bg-slate-950/20">
+            <main className="flex-1 flex flex-col relative bg-slate-950/20 h-screen overflow-y-auto custom-scrollbar">
                 {/* Chat Area */}
-                <div className="flex-1 overflow-y-auto pt-10 pb-32 px-4 scroll-smooth custom-scrollbar">
+                <div className="flex-1 pt-10 pb-32 px-4">
                     <div className="max-w-3xl mx-auto space-y-8">
                         {/* Welcome State */}
                         <div className="text-center py-20 px-6">
@@ -98,7 +90,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Bottom Input Area */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 bg-linear-to-t from-slate-950 via-slate-950/90 to-transparent pt-20">
+                <div className="sticky bottom-0 left-0 right-0 p-6 bg-linear-to-t from-slate-950 via-slate-950/90 to-transparent pt-20">
                     <div className="max-w-3xl mx-auto relative group">
                         <div className="absolute -inset-1 bg-linear-to-r from-blue-600/20 to-indigo-600/20 rounded-2xl blur opacity-25 group-focus-within:opacity-50 transition-opacity"></div>
                         <div className="relative flex items-center bg-slate-900/80 border border-slate-800/50 backdrop-blur-xl rounded-2xl px-4 py-2 focus-within:border-blue-500/50 transition-all shadow-2xl">
@@ -126,6 +118,6 @@ export default function Dashboard() {
                     </div>
                 </div>
             </main>
-        </div>
+        </>
     );
 }

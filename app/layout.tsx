@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
+import { Background } from "@/components/ui/Background";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +31,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased`}
       >
-        {children}
+        <div className="min-h-screen flex justify-center items-center relative font-['Inter',sans-serif]">
+          <Background />
+          {children}
+        </div>
       </body>
     </html>
   );

@@ -4,10 +4,10 @@ import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { HOST_SERVER } from '../const';
 import { Toast } from '@/components/Toast';
-import { Background } from '@/components/ui/Background';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import Link from 'next/link';
 
 export default function Login() {
     const router = useRouter();
@@ -89,9 +89,7 @@ export default function Login() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-6 relative font-['Inter',sans-serif]">
-            <Background />
-
+        <>
             {formState.message || formState.error || formState.loading ? (
                 <Toast
                     message={formState.loading ? 'Cargando...' : (formState.error || formState.message)}
@@ -123,11 +121,6 @@ export default function Login() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
-                            rightElement={
-                                <button type="button" className="text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors">
-                                    ¿Olvidaste tu contraseña?
-                                </button>
-                            }
                         />
 
                         <Button
@@ -138,13 +131,16 @@ export default function Login() {
                         >
                             Iniciar Sesión
                         </Button>
+                        <button type="button" className="text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors cursor-pointer block mx-auto">
+                            ¿Olvidaste tu contraseña?
+                        </button>
                     </form>
                 </Card>
 
                 <p className="text-center text-slate-500 text-sm mt-8">
-                    ¿No tienes una cuenta? <button className="text-blue-400 font-semibold hover:underline">Crear cuenta</button>
+                    ¿No tienes una cuenta? <Link href="/register" className="text-blue-400 font-semibold hover:underline cursor-pointer">Crear cuenta</Link>
                 </p>
             </div>
-        </div>
+        </>
     );
 }

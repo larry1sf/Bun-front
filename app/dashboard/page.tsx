@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { HOST_SERVER } from "../const";
 import { Sidebar, SidebarItem } from '@/components/shared/Sidebar';
-import { StatCard } from '@/components/shared/StatCard';
 import { Background } from '@/components/ui/Background';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';

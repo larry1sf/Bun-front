@@ -116,7 +116,7 @@ export const Sidebar = ({ isOpen, setOpen, onLogout, userName = "User", userPlan
                 {/* Dropdown Menu */}
                 {isOpen && isDropdownOpen && (
                     <div className="absolute bottom-full left-2 right-2 mb-2 bg-slate-900 border border-slate-800 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-200 [&>button]:cursor-pointer">
-                        <button
+                        <Link href="/dashboard/info-user"
                             onClick={handleUserInfoClick}
                             className="w-full flex items-center space-x-3 px-4 py-3 text-sm text-slate-300 hover:bg-slate-800/50 transition-colors"
                         >
@@ -124,7 +124,7 @@ export const Sidebar = ({ isOpen, setOpen, onLogout, userName = "User", userPlan
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
                             <span>Información de Usuario</span>
-                        </button>
+                        </Link>
                         <div className="border-t border-slate-800"></div>
                         <button
                             onClick={handleLogoutClick}

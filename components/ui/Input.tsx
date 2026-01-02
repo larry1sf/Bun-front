@@ -3,12 +3,14 @@
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
     error?: string;
+    helperText?: string;
     rightElement?: React.ReactNode;
 }
 
 export const Input = ({
     label,
     error,
+    helperText,
     rightElement,
     className = '',
     id,
@@ -32,6 +34,7 @@ export const Input = ({
                 />
             </div>
             {error && <p className="text-xs text-red-400 ml-1">{error}</p>}
+            {!error && helperText && <p className="text-xs text-slate-500 ml-1">{helperText}</p>}
         </div>
     );
 };

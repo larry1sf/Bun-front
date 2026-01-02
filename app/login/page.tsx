@@ -1,7 +1,7 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react';
 import { HOST_SERVER } from '../const';
 import { Toast } from '@/components/Toast';
 import { Card } from '@/components/ui/Card';
@@ -11,8 +11,12 @@ import Link from 'next/link';
 
 export default function Login() {
     const router = useRouter();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const searchParams = useSearchParams();
+    const [userInfo, setUserInfo] = useState({
+        username: '',
+        password: '',
+        email: ''
+    })
     const [formState, setFormState] = useState({
         error: '',
         loading: false,
@@ -24,10 +28,22 @@ export default function Login() {
         fetch(`${HOST_SERVER}/login`, {
             credentials: "include"
         })
-            .then(res => {
+            .then((res) => {
                 if (res.ok) router.push("/dashboard")
             })
     }, [router])
+
+    useEffect(() => {
+        // Check if password was changed
+        if (searchParams.get('passwordChanged') === 'true') {
+            setFormState({
+                error: '',
+                loading: false,
+                message: 'Contraseña actualizada correctamente',
+                status: 'success'
+            })
+        }
+    }, [searchParams])
 
     const handleForm = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -38,9 +54,9 @@ export default function Login() {
             status: 'loading'
         })
 
-        if (!email || !password) {
+        if (!userInfo.username || !userInfo.password) {
             setFormState({
-                error: "Email o password no proporcionados",
+                error: "username o password no proporcionados",
                 loading: false,
                 message: "",
                 status: 'error'
@@ -54,7 +70,7 @@ export default function Login() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify(userInfo),
                 credentials: 'include'
             })
 
@@ -67,7 +83,10 @@ export default function Login() {
                     status: data.status === 200 ? 'success' : 'error'
                 })
                 if (data.status === 200)
-                    router.push('/dashboard')
+                    setTimeout(() => {
+                        router.push('/dashboard')
+                    }, 100);
+
             }
             else {
                 setFormState({
@@ -89,7 +108,7 @@ export default function Login() {
     }
 
     return (
-        <>
+        <div className='p-6'>
             {formState.message || formState.error || formState.loading ? (
                 <Toast
                     message={formState.loading ? 'Cargando...' : (formState.error || formState.message)}
@@ -109,8 +128,8 @@ export default function Login() {
                             label="Usuario o correo"
                             type="text"
                             placeholder="username"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            value={userInfo.username}
+                            onChange={(e) => setUserInfo(prev => ({ ...prev, username: e.target.value }))}
                             required
                         />
 
@@ -118,22 +137,21 @@ export default function Login() {
                             label="Contraseña"
                             type="password"
                             placeholder="••••••••"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            value={userInfo.password}
+                            onChange={(e) => setUserInfo(prev => ({ ...prev, password: e.target.value }))}
                             required
                         />
 
                         <Button
                             type="submit"
-                            className="w-full mt-4"
+                            className="w-full mt-4 group cursor-pointer"
                             isLoading={formState.loading}
-                            icon="→"
                         >
                             Iniciar Sesión
                         </Button>
-                        <button type="button" className="text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors cursor-pointer block mx-auto">
+                        <Link href="/change-password" className="text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors cursor-pointer block mx-auto w-fit">
                             ¿Olvidaste tu contraseña?
-                        </button>
+                        </Link>
                     </form>
                 </Card>
 
@@ -141,6 +159,6 @@ export default function Login() {
                     ¿No tienes una cuenta? <Link href="/register" className="text-blue-400 font-semibold hover:underline cursor-pointer">Crear cuenta</Link>
                 </p>
             </div>
-        </>
+        </div>
     );
 }

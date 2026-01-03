@@ -55,6 +55,28 @@ export default function Register() {
             return;
         }
 
+        // Validación de usuario - longitud máxima
+        if (userInfo.username.length > 15) {
+            setFormState({
+                error: "El nombre de usuario no puede tener más de 15 caracteres",
+                loading: false,
+                message: "",
+                status: 'error'
+            });
+            return;
+        }
+
+        // Validación de usuario - sin signos raros (solo letras, números y espacios)
+        if (!/^[a-zA-Z0-9\s]+$/.test(userInfo.username)) {
+            setFormState({
+                error: "El nombre de usuario solo puede contener letras, números y espacios",
+                loading: false,
+                message: "",
+                status: 'error'
+            });
+            return;
+        }
+
         // Validación de contraseña - longitud mínima
         if (userInfo.password.length < 6) {
             setFormState({
@@ -109,8 +131,8 @@ export default function Register() {
 
                 // Redirigir al login después de un registro exitoso
                 setTimeout(() => {
-                    router.push('/login');
-                }, 1500);
+                    router.push('/dashboard');
+                }, 1000);
             }
             else {
                 const errorData = await response.json();
@@ -155,7 +177,8 @@ export default function Register() {
                             placeholder="usuario123"
                             value={userInfo.username}
                             onChange={(e) => setUserInfo({ ...userInfo, username: e.target.value })}
-                            helperText="Letras, números y caracteres especiales permitidos"
+                            helperText="Máximo 15 caracteres. Solo letras, números y espacios"
+                            maxLength={15}
                             required
                         />
 

@@ -24,3 +24,7 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.btn-secondary {
+  @apply bg-slate-800/50 hover:bg-slate-700/50 text-slate-200 border border-slate-700 p-3 rounded-xl;
+}

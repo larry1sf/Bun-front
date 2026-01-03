@@ -1,11 +1,10 @@
 import { Background } from "@/components/ui/Background";
+import Spinner from "@/components/Spinner";
 
 export default function Loading() {
     return <div className="size-full">
         <Background />
-        <div className="flex items-center justify-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-sky-600 border-t-transparent"></div>
-        </div>
+        <Spinner />
 
     </div>
 }

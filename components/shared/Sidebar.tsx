@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '../ui/Button';
 import { Ellipsis } from 'lucide-react';
+import { User } from '@/types';
 
 interface SidebarItemProps {
     icon: string;
@@ -28,12 +29,11 @@ interface SidebarProps {
     isOpen: boolean;
     setOpen: (open: boolean) => void;
     onLogout: () => void;
-    userName?: string;
-    userPlan?: string;
+    user: User | null;
     children?: React.ReactNode;
 }
 
-export const Sidebar = ({ isOpen, setOpen, onLogout, userName = "User", userPlan = "Plan", children }: SidebarProps) => {
+export const Sidebar = ({ isOpen, setOpen, onLogout, user, children }: SidebarProps) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -62,7 +62,7 @@ export const Sidebar = ({ isOpen, setOpen, onLogout, userName = "User", userPlan
 
     return (
         <aside className={`${isOpen ? 'w-72' : 'w-20'} bg-slate-950/50 border-r border-slate-900 transition-all duration-500 flex flex-col p-4 z-20 h-screen`}>
-            <Link href="/" className="flex items-center space-x-3 px-2 w-fit mb-6 h-10">
+            <Link href="/dashboard" className="flex items-center space-x-3 px-2 w-fit mb-6 h-10">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/20">A</div>
                 {isOpen && <span className="text-xl font-bold bg-linear-to-r from-white to-slate-400 bg-clip-text text-transparent">Antigravity IA</span>}
             </Link>
@@ -96,9 +96,16 @@ export const Sidebar = ({ isOpen, setOpen, onLogout, userName = "User", userPlan
                     <div className="w-10 h-10 rounded-full bg-slate-800 animate-pulse border border-slate-700"></div>
                     {isOpen && (
                         <>
-                            <div className="flex-1 overflow-hidden">
-                                <p className="text-sm font-semibold truncate">{userName}</p>
-                                <p className="text-xs text-slate-500 truncate">{userPlan}</p>
+                            <div className="flex-1 space-y-1 gap-4 overflow-hidden">
+                                <p className="text-sm font-semibold text-slate-300 truncate">{user?.username}</p>
+                                {
+                                    user?.securityPhrase ? (
+                                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                            Verificado
+                                        </div>
+                                    ) : null
+                                }
                             </div>
                             <div>
                                 <button

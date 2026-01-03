@@ -26,10 +26,10 @@ export const Input = ({
                     {rightElement}
                 </div>
             )}
-            <div className="relative group">
+            <div className={`relative overflow-hidden group w-full bg-slate-950/50 border border-slate-800 rounded-2xl transition-all duration-300 hover:border-slate-700 focus-within:border-blue-500/50 focus-within:ring-4 focus-within:ring-blue-500/10 ${error ? 'border-red-500/50' : ''}`}>
                 <input
                     id={id}
-                    className={`w-full bg-slate-950/50 border border-slate-800 rounded-2xl px-5 py-4 text-slate-100 placeholder:text-slate-600 outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 group-hover:border-slate-700 ${error ? 'border-red-500/50' : ''} ${className}`}
+                    className={`w-full h-full px-5 py-4 bg-transparent border-none outline-none text-slate-100 placeholder:text-slate-600 ${className}`}
                     {...props}
                 />
             </div>

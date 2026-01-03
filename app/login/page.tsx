@@ -82,10 +82,22 @@ export default function Login() {
                     message: data.message,
                     status: data.status === 200 ? 'success' : 'error'
                 })
-                if (data.status === 200)
+                if (data.status === 200) {
+                    setUserInfo({
+                        username: '',
+                        password: '',
+                        email: ''
+                    })
                     setTimeout(() => {
+                        setFormState({
+                            error: '',
+                            loading: false,
+                            message: '',
+                            status: 'success'
+                        })
                         router.push('/dashboard')
-                    }, 100);
+                    }, 500);
+                }
 
             }
             else {
@@ -111,6 +123,7 @@ export default function Login() {
         <div className='p-6'>
             {formState.message || formState.error || formState.loading ? (
                 <Toast
+                    duration={1500}
                     message={formState.loading ? 'Cargando...' : (formState.error || formState.message)}
                     variant={formState.status}
                     onClose={() => setFormState(prev => ({ ...prev, message: '', error: '' }))}

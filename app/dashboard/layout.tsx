@@ -8,7 +8,6 @@ export default async function WrapperSidebar({ children }: { children: React.Rea
 
     const cookieStore = await cookies()
     const allCookies = cookieStore.getAll().map(c => `${c.name}=${c.value}`).join('; ')
-
     let user = null
 
     try {
@@ -20,8 +19,11 @@ export default async function WrapperSidebar({ children }: { children: React.Rea
         })
 
         if (!res.ok) {
-            console.error("Error al obtener datos del usuario")
-            // redirect("/login")
+            if(res.status !== 200){
+                console.error("Error al obtener datos del usuario")
+                redirect("/login")
+            }
+            throw new Error('Failed to fetch user data')
         }
         const { data } = await res.json()
         user = data

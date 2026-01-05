@@ -88,13 +88,13 @@ export default function Login() {
                         password: '',
                         email: ''
                     })
+                    setFormState({
+                        error: '',
+                        loading: false,
+                        message: '',
+                        status: 'success'
+                    })
                     setTimeout(() => {
-                        setFormState({
-                            error: '',
-                            loading: false,
-                            message: '',
-                            status: 'success'
-                        })
                         router.push('/dashboard')
                     }, 500);
                 }

@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { HOST_SERVER } from "../../app/const"
 import { Sidebar } from '@/components/dashboard/Sidebar'
 import { useUser } from '@/components/Context/contextInfoUser'
@@ -27,6 +27,11 @@ export default function SidebarClient({ children }: { children: React.ReactNode 
             console.error('Error logging out:', error)
         }
     }
+
+    useEffect(() => {
+        console.log("user: ", user)
+
+    }, [user])
 
     return (
         <ChatProvider initialValue={null}>

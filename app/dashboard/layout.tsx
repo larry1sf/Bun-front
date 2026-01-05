@@ -19,8 +19,10 @@ export default async function WrapperSidebar({ children }: { children: React.Rea
             cache: 'no-store'
         })
 
-        if (!res.ok)
+        if (!res.ok) {
+            console.error("Error al obtener datos del usuario")
             redirect("/login")
+        }
 
         const { data } = await res.json()
         user = data

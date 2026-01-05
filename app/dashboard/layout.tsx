@@ -28,7 +28,7 @@ export default async function WrapperSidebar({ children }: { children: React.Rea
         user = data
     } catch (error) {
         console.error('Error fetching user data in server sidebar:', error)
-        // redirect("/login")
+        redirect("/login")
     }
 
     return (

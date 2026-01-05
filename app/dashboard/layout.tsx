@@ -21,14 +21,14 @@ export default async function WrapperSidebar({ children }: { children: React.Rea
 
         if (!res.ok) {
             console.error("Error al obtener datos del usuario")
-            redirect("/login")
+            // redirect("/login")
         }
 
         const { data } = await res.json()
         user = data
     } catch (error) {
         console.error('Error fetching user data in server sidebar:', error)
-        redirect("/login")
+        // redirect("/login")
     }
 
     return (

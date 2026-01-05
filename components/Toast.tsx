@@ -33,7 +33,7 @@ export const Toast = ({ message, variant = 'info', duration = 3000, onClose }: T
     };
 
     return (
-        <div className={`fixed top-10 left-1/2 -translate-x-1/2 z-[100] px-8 py-4 rounded-2xl border backdrop-blur-xl transition-all duration-300 animate-in fade-in slide-in-from-top-4 ${variantStyles[variant]}`}>
+        <div className={`fixed top-10 left-1/2 -translate-x-1/2 z-9999 px-8 py-4 rounded-2xl border backdrop-blur-xl transition-all duration-300 animate-in fade-in slide-in-from-top-4 ${variantStyles[variant]}`}>
             <div className="flex items-center space-x-3">
                 {variant === 'loading' && (
                     <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>

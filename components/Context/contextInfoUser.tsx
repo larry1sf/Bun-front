@@ -1,4 +1,5 @@
 "use client"
+import { User } from "@/types";
 import { createContext, useContext, useState, useEffect } from "react"
 
 const UserContext = createContext<{
@@ -9,13 +10,6 @@ const UserContext = createContext<{
     setUser: () => { }
 })
 
-interface User {
-    username: string | null;
-    email: string | null;
-    id: number | null;
-    securityPhrase: string | null;
-    image: string | null;
-}
 export const UserProvider = ({ initialValue, children }: { initialValue: User; children: React.ReactNode }) => {
     const [user, setUser] = useState<User>(initialValue)
 

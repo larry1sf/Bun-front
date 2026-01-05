@@ -4,7 +4,8 @@ import Spinner from "@/components/Spinner";
 export default function Loading() {
     return <div className="size-full">
         <Background />
-        <Spinner />
-
+        <main className="flex flex-col items-center justify-center size-full">
+            <Spinner />
+        </main>
     </div>
 }

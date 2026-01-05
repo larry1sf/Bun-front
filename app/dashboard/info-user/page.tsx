@@ -149,24 +149,24 @@ export default function InfoUser() {
     }
 
     return (
-        <div className="max-w-6xl size-full p-6 mx-auto space-y-8">
-            <div className="flex items-center justify-between border-b border-slate-800/50 pb-6">
-                <div className="flex items-center gap-4">
-                    <Link href="/dashboard" className="btn-secondary ">
-                        <ArrowLeft size={24} />
+        <div className="max-w-6xl size-full p-4 sm:p-6 mx-auto space-y-6 sm:space-y-8 overflow-y-auto custom-scrollbar">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-slate-800/50 pb-6 gap-4">
+                <div className="flex items-center gap-3 sm:gap-4">
+                    <Link href="/dashboard" className="btn-secondary h-10 w-10 flex items-center justify-center p-0">
+                        <ArrowLeft size={20} />
                     </Link>
                     <div>
-                        <h1 className="text-3xl font-bold text-white mb-1">Perfil</h1>
-                        <p className="text-slate-400 text-sm">Gestiona tu identidad y seguridad</p>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-0.5 sm:mb-1">Perfil</h1>
+                        <p className="text-slate-400 text-xs sm:text-sm">Gestiona tu identidad y seguridad</p>
                     </div>
                 </div>
                 {isEditing ? (
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
                         <Button
                             variant="secondary"
                             onClick={handleCancel}
                             icon={<X size={16} />}
-                            className="text-sm"
+                            className="text-xs sm:text-sm flex-1 sm:flex-none"
                         >
                             Cancelar
                         </Button>
@@ -174,10 +174,10 @@ export default function InfoUser() {
                             variant="primary"
                             onClick={handleSave}
                             icon={isLoading ? <Loader className="animate-spin" size={16} /> : <Save size={16} />}
-                            className="text-sm"
+                            className="text-xs sm:text-sm flex-1 sm:flex-none"
                             disabled={isLoading}
                         >
-                            {isLoading ? 'Guardando...' : 'Guardar'}
+                            {isLoading ? '...' : 'Guardar'}
                         </Button>
                     </div>
                 ) : (
@@ -188,7 +188,7 @@ export default function InfoUser() {
                         }}
                         variant="secondary"
                         icon={<Edit2 size={16} />}
-                        className="text-sm"
+                        className="text-xs sm:text-sm w-full sm:w-auto"
                     >
                         Editar
                     </Button>
@@ -206,11 +206,11 @@ export default function InfoUser() {
                         <div className="md:col-span-4 lg:col-span-3 space-y-6">
                             <Card className="p-6 flex flex-col items-center text-center space-y-4 relative overflow-hidden">
                                 <div className="relative group">
-                                    <div className={`w-32 h-32 rounded-full border-4 border-slate-800 bg-slate-900 flex items-center justify-center overflow-hidden shadow-2xl relative ${isEditing ? 'cursor-pointer hover:border-slate-700' : ''}`}>
+                                    <div className={`w-28 h-28 sm:w-32 sm:h-32 rounded-full border-4 border-slate-800 bg-slate-900 flex items-center justify-center overflow-hidden shadow-2xl relative ${isEditing ? 'cursor-pointer hover:border-slate-700' : ''}`}>
                                         {formData.image ? (
                                             <img src={formData.image} alt="Profile" className="w-full h-full object-cover" />
                                         ) : (
-                                            <User size={48} className="text-slate-600" />
+                                            <User size={40} className="text-slate-600 sm:w-12 sm:h-12" />
                                         )}
 
                                         {isEditing && (
@@ -254,14 +254,17 @@ export default function InfoUser() {
                         <div className="md:col-span-8 lg:col-span-9 space-y-6">
                             <Card className="overflow-hidden">
                                 {/* Personal Information Section */}
-                                <div className="p-6 sm:p-8 border-b border-slate-800/50">
+                                <div className="p-5 sm:p-8 border-b border-slate-800/50">
                                     <div className="flex items-center gap-3 mb-6">
-                                        <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400">
+                                        <div className="hidden sm:block p-2 rounded-lg bg-blue-500/10 text-blue-400">
                                             <User size={24} />
                                         </div>
+                                        <div className="sm:hidden p-1.5 rounded-lg bg-blue-500/10 text-blue-400">
+                                            <User size={18} />
+                                        </div>
                                         <div>
-                                            <h3 className="text-xl font-bold text-white">Información Personal</h3>
-                                            <p className="text-sm text-slate-400">Actualiza tus datos de identificación</p>
+                                            <h3 className="text-lg sm:text-xl font-bold text-white">Información Personal</h3>
+                                            <p className="text-xs sm:text-sm text-slate-400">Explora y actualiza tus datos</p>
                                         </div>
                                     </div>
 
@@ -310,20 +313,20 @@ export default function InfoUser() {
                                             </div>
                                         ) : (
                                             <div className="grid gap-6 md:grid-cols-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                                <div className="group p-4 rounded-xl bg-slate-950/30 border border-slate-800/50 hover:border-slate-700/50 transition-colors">
-                                                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5 block">
+                                                <div className="group p-3 sm:p-4 rounded-xl bg-slate-950/30 border border-slate-800/50 hover:border-slate-700/50 transition-colors">
+                                                    <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1 sm:mb-1.5 block">
                                                         Nombre de Usuario
                                                     </label>
-                                                    <div className="flex items-center gap-3 text-base font-medium text-slate-200">
+                                                    <div className="flex items-center gap-2 sm:gap-3 text-sm sm:text-base font-medium text-slate-200">
                                                         {user.username || 'No definido'}
                                                     </div>
                                                 </div>
 
-                                                <div className="group p-4 rounded-xl bg-slate-950/30 border border-slate-800/50 hover:border-slate-700/50 transition-colors">
-                                                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5 block">
+                                                <div className="group p-3 sm:p-4 rounded-xl bg-slate-950/30 border border-slate-800/50 hover:border-slate-700/50 transition-colors">
+                                                    <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1 sm:mb-1.5 block">
                                                         Correo Electrónico
                                                     </label>
-                                                    <div className="flex items-center gap-3 text-base font-medium text-slate-200">
+                                                    <div className="flex items-center gap-2 sm:gap-3 text-sm sm:text-base font-medium text-slate-200 truncate pr-2" title={user.email ?? undefined}>
                                                         {user.email || 'No definido'}
                                                     </div>
                                                 </div>
@@ -333,14 +336,17 @@ export default function InfoUser() {
                                 </div>
 
                                 {/* Security Section */}
-                                <div className="p-6 sm:p-8 ">
+                                <div className="p-5 sm:p-8 ">
                                     <div className="flex items-center gap-3 mb-6">
-                                        <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+                                        <div className="hidden sm:block p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
                                             <Shield size={24} />
                                         </div>
+                                        <div className="sm:hidden p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
+                                            <Shield size={18} />
+                                        </div>
                                         <div>
-                                            <h3 className="text-xl font-bold text-white">Seguridad</h3>
-                                            <p className="text-sm text-slate-400">Protege tu cuenta con una frase única</p>
+                                            <h3 className="text-lg sm:text-xl font-bold text-white">Seguridad</h3>
+                                            <p className="text-xs sm:text-sm text-slate-400">Protege tu cuenta adecuadamente</p>
                                         </div>
                                     </div>
 
@@ -351,7 +357,7 @@ export default function InfoUser() {
                                                     label="Frase de Seguridad"
                                                     id="securityPhrase"
                                                     type="password"
-                                                    placeholder="Ingresa tu frase de seguridad"
+                                                    placeholder={user.securityPhrase ? "Cambia tu frase de seguridad" : "Ingresa tu frase de seguridad"}
                                                     value={formData.securityPhrase}
                                                     onChange={(e) => setFormData({ ...formData, securityPhrase: e.target.value })}
                                                     rightElement={<Key size={16} className="text-slate-500" />}
@@ -363,14 +369,14 @@ export default function InfoUser() {
                                         ) : (
                                             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                                                 {user.securityPhrase ? (
-                                                    <div className="p-4 rounded-xl bg-slate-950/30 border border-slate-800/50 flex items-center justify-between group hover:border-emerald-500/30 transition-colors">
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
-                                                                <Key size={20} />
+                                                    <div className="p-3 sm:p-4 rounded-xl bg-slate-950/30 border border-slate-800/50 flex items-center justify-between group hover:border-emerald-500/30 transition-colors">
+                                                        <div className="flex items-center gap-3 sm:gap-4">
+                                                            <div className="p-1.5 sm:p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+                                                                <Key size={18} className="sm:w-5 sm:h-5" />
                                                             </div>
                                                             <div>
-                                                                <p className="text-xs font-bold text-emerald-500/70 uppercase tracking-widest mb-0.5">Verificado</p>
-                                                                <p className="text-sm font-medium text-slate-200">Frase de Seguridad Configurada</p>
+                                                                <p className="text-[10px] sm:text-xs font-bold text-emerald-500/70 uppercase tracking-widest mb-0.5">Verificado</p>
+                                                                <p className="text-xs sm:text-sm font-medium text-slate-200">Frase Configurada</p>
                                                             </div>
                                                         </div>
                                                         <div className="hidden sm:block text-xs text-slate-500">
@@ -379,19 +385,19 @@ export default function InfoUser() {
                                                     </div>
                                                 ) : (
                                                     <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 flex flex-col sm:flex-row items-center justify-between gap-4">
-                                                        <div className="flex items-center gap-4">
+                                                        <div className="flex items-center gap-3 sm:gap-4 w-full">
                                                             <div className="p-2 rounded-lg bg-amber-500/20 text-amber-400">
                                                                 <AlertCircle size={20} />
                                                             </div>
                                                             <div>
-                                                                <p className="text-xs font-bold text-amber-500/70 uppercase tracking-widest">Sin verificar</p>
-                                                                <p className="text-sm font-medium text-amber-50">Sin frase de seguridad</p>
+                                                                <p className="text-[10px] sm:text-xs font-bold text-amber-500/70 uppercase tracking-widest">Sin verificar</p>
+                                                                <p className="text-xs sm:text-sm font-medium text-amber-50">Sin frase de seguridad</p>
                                                             </div>
                                                         </div>
                                                         <Button
                                                             variant="secondary"
                                                             onClick={() => setIsEditing(true)}
-                                                            className="w-full sm:w-auto text-xs py-1 h-8 bg-amber-500/20 border-amber-500/30 text-amber-400 hover:bg-amber-500/30"
+                                                            className="w-full sm:w-auto text-[10px] sm:text-xs py-1 h-8 bg-amber-500/20 border-amber-500/30 text-amber-400 hover:bg-amber-500/30"
                                                         >
                                                             Configurar
                                                         </Button>

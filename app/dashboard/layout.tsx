@@ -1,5 +1,5 @@
 
-import SidebarClient from '@/app/dashboard/SidebarClient'
+import SidebarClient from '@/components/dashboard/SidebarClient'
 import { UserProvider } from "@/components/Context/contextInfoUser"
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
@@ -19,9 +19,8 @@ export default async function WrapperSidebar({ children }: { children: React.Rea
             cache: 'no-store'
         })
 
-        if (!res.ok) {
+        if (!res.ok)
             redirect("/login")
-        }
 
         const { data } = await res.json()
         user = data
@@ -32,7 +31,7 @@ export default async function WrapperSidebar({ children }: { children: React.Rea
 
     return (
         <UserProvider initialValue={user}>
-            <SidebarClient user={user}>
+            <SidebarClient >
                 {children}
             </SidebarClient>
         </UserProvider>

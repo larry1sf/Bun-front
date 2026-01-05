@@ -31,7 +31,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased`}
       >
-        <div className="min-h-screen flex justify-center items-center relative font-['Inter',sans-serif]">
+        <div className="h-screen flex justify-center items-center relative font-['Inter',sans-serif]">
           <Background />
           {children}
         </div>

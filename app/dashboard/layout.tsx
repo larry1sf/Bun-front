@@ -20,8 +20,8 @@ export default async function WrapperSidebar({ children }: { children: React.Rea
 
         if (!res.ok) {
             if(res.status !== 200){
-                console.error("Error al obtener datos del usuario")
-                redirect("/login")
+                console.log("Error al obtener datos del usuario")
+                // redirect("/login")
             }
             throw new Error('Failed to fetch user data')
         }

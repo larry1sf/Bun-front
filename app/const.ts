@@ -1,1 +1,1 @@
-export const HOST_SERVER = process.env.NEXT_PUBLIC_HOST_SERVER || ''
+export const HOST_SERVER = typeof window === 'undefined' ? (process.env.NEXT_PUBLIC_HOST_SERVER || '') : '/server'

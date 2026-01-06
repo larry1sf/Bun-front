@@ -12,7 +12,15 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       }
     ]
-  }
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/server/:path*',
+        destination: `${process.env.NEXT_PUBLIC_HOST_SERVER || 'http://localhost:8080'}/:path*`,
+      },
+    ]
+  },
 };
 
 export default nextConfig;

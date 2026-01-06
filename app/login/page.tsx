@@ -95,7 +95,8 @@ export default function Login() {
                         status: 'success'
                     })
                     setTimeout(() => {
-                        router.push('/dashboard')
+                        console.log(data)
+                        // router.push('/dashboard')
                     }, 500);
                 }
 

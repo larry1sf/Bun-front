@@ -11,6 +11,8 @@ export default async function WrapperSidebar({ children }: { children: React.Rea
     let user = null
 
     try {
+        console.log(allCookies);
+
         const res = await fetch(`${HOST_SERVER}/dashboard`, {
             headers: {
                 Cookie: allCookies
@@ -19,17 +21,18 @@ export default async function WrapperSidebar({ children }: { children: React.Rea
         })
 
         if (!res.ok) {
-            if(res.status !== 200){
+            if (res.status !== 200) {
                 console.log("Error al obtener datos del usuario")
                 // redirect("/login")
             }
-            throw new Error('Failed to fetch user data')
         }
         const { data } = await res.json()
         user = data
     } catch (error) {
         console.error('Error fetching user data in server sidebar:', error)
         // redirect("/login")
+        // console.log("Error redirect abajo");
+
     }
 
     return (

@@ -24,7 +24,6 @@ export default async function WrapperSidebar({ children }: { children: React.Rea
             if (res.status !== 200) {
                 console.error("Error al obtener datos del usuario")
                 // redirect("/login")
-                return
             }
         }
         const { data } = await res.json()

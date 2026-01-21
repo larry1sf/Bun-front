@@ -54,7 +54,13 @@ export const SidebarItem = ({
     return (
         <div
             onClick={onClick}
-            className={`group flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 relative ${active ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'} ${onClick ? 'cursor-pointer' : 'cursor-not-allowed'} ${className}`}
+            className={`outline-transparent border  group flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 relative ${active
+                ? 'bg-blue-600/20 text-blue-400 border-blue-500/30'
+                : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border-transparent'
+                } ${onClick
+                    ? 'cursor-pointer'
+                    : 'cursor-not-allowed'
+                } ${className}`}
         >
             <span className="text-xl shrink-0">{icon}</span>
             {isOpen && <span className="font-medium whitespace-nowrap truncate text-sm flex-1">{label}</span>}

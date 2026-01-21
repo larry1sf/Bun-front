@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/server/:path*',
-        destination: `${process.env.NEXT_PUBLIC_HOST_SERVER || 'http://localhost:8080'}/:path*`,
+        destination: `${process.env.HOST_SERVER || 'http://localhost:8080'}/:path*`,
       },
     ]
   },

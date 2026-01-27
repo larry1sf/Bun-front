@@ -1,8 +1,8 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { HOST_SERVER } from "../../app/const"
+import { useState } from 'react'
+
 import { Sidebar } from '@/components/dashboard/Sidebar'
 import { useUser } from '@/components/Context/contextInfoUser'
 import { ChatProvider } from '@/components/Context/contextInfoChat'
@@ -10,12 +10,12 @@ import { ChatProvider } from '@/components/Context/contextInfoChat'
 
 export default function SidebarClient({ children }: { children: React.ReactNode }) {
     const [isSidebarOpen, setSidebarOpen] = useState(true)
-    const router = useRouter()
     const { user, setUser } = useUser()
+    const router = useRouter()
 
     const handleLogout = async () => {
         try {
-            const response = await fetch(`${HOST_SERVER}/logout`, {
+            const response = await fetch('/api/logout', {
                 method: 'POST',
                 credentials: 'include'
             })
@@ -27,11 +27,6 @@ export default function SidebarClient({ children }: { children: React.ReactNode 
             console.error('Error logging out:', error)
         }
     }
-
-    useEffect(() => {
-        console.log("user: ", user)
-
-    }, [user])
 
     return (
         <ChatProvider initialValue={null}>

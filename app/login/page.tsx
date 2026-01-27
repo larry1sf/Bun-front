@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { HOST_SERVER } from '@/app/const';
 import { Toast } from '@/components/Toast';
@@ -11,18 +11,19 @@ import Link from 'next/link';
 
 export default function Login() {
     const router = useRouter();
-    const searchParams = useSearchParams();
+    // const searchParams = useSearchParams();
 
     const [userInfo, setUserInfo] = useState({
         username: '',
         password: '',
         email: ''
     })
+    type estados = 'success' | 'error' | 'info' | 'loading'
     const [formState, setFormState] = useState({
         error: '',
         loading: false,
         message: '',
-        status: 'info' as 'success' | 'error' | 'info' | 'loading'
+        status: 'loading' as estados
     })
 
     useEffect(() => {
@@ -32,19 +33,10 @@ export default function Login() {
             .then((res) => {
                 if (res.ok) router.push("/dashboard")
             })
-    }, [router])
-
-    useEffect(() => {
-        // Check if password was changed
-        if (searchParams.get('passwordChanged') === 'true') {
-            setFormState({
-                error: '',
-                loading: false,
-                message: 'Contraseña actualizada correctamente',
-                status: 'success'
+            .catch((error) => {
+                console.error('Login error:', error);
             })
-        }
-    }, [searchParams])
+    }, [router])
 
     const handleForm = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -74,44 +66,57 @@ export default function Login() {
                 body: JSON.stringify(userInfo),
                 credentials: 'include'
             })
+            const data = await response.json()
+            console.log(data.status);
 
-            if (response.ok) {
-                const data = await response.json()
+            setFormState({
+                error: '',
+                loading: false,
+                message: data.message,
+                status: data.status === 200 ? 'success' : 'error'
+            })
+            if (data.status === 200) {
+                setUserInfo({
+                    username: '',
+                    password: '',
+                    email: ''
+                })
                 setFormState({
                     error: '',
                     loading: false,
-                    message: data.message,
-                    status: data.status === 200 ? 'success' : 'error'
+                    message: 'Bienvenido',
+                    status: 'success'
                 })
-                if (data.status === 200) {
-                    setUserInfo({
-                        username: '',
-                        password: '',
-                        email: ''
-                    })
+                setTimeout(() => {
+                    router.push('/dashboard')
                     setFormState({
                         error: '',
                         loading: false,
                         message: '',
-                        status: 'success'
+                        status: 'loading'
                     })
-                    setTimeout(() => {
-                        console.log(data)
-                        router.push('/dashboard')
-                    }, 500);
-                }
+                }, 500)
+                return
+            }
+            if (data.status === 500) {
+                setFormState(prev => ({
+                    ...prev,
+                    error: 'Contraseña incorrecta',
+                    loading: false,
+                    status: 'error'
 
+                }))
+                return
             }
             else {
                 setFormState({
-                    error: 'Error al iniciar sesión',
+                    error: 'Fallo la conexión',
                     loading: false,
                     message: '',
                     status: 'error'
                 })
             }
         } catch (error) {
-            console.error('Login error:', error);
             setFormState({
                 error: 'Error de conexión con el servidor',
                 loading: false,
@@ -126,7 +131,9 @@ export default function Login() {
             {formState.message || formState.error || formState.loading ? (
                 <Toast
                     duration={1500}
-                    message={formState.loading ? 'Cargando...' : (formState.error || formState.message)}
+                    message={formState.loading
+                        ? 'Cargando...'
+                        : (formState.error || formState.message)}
                     variant={formState.status}
                     onClose={() => setFormState(prev => ({ ...prev, message: '', error: '' }))}
                 />

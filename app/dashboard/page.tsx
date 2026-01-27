@@ -1,5 +1,4 @@
 import ChatBottomInputArea from "@/components/dashboard/ChatBottomInputArea";
-import { ChatProvider } from "@/components/Context/contextInfoChat";
 import ChatContainer from "@/components/dashboard/ChatContainer";
 
 export default async function Dashboard() {

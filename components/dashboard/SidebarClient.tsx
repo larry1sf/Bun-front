@@ -36,7 +36,7 @@ export default function SidebarClient({ children }: { children: React.ReactNode 
                 onLogout={handleLogout}
                 user={user}
             />
-            <div className="flex-1 flex flex-col relative bg-slate-950/20 h-screen overflow-hidden">
+            <div className={`flex-1 flex flex-col relative bg-slate-950/20 h-screen overflow-hidden ${isSidebarOpen ? 'opacity-0 md:opacity-100' : 'opacity-100'} `}>
                 {children}
             </div>
         </ChatProvider>

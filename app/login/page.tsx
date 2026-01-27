@@ -1,8 +1,8 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useEffect, useRef } from 'react';
-import { HOST_SERVER } from '../const';
+import { useState, useEffect } from 'react';
+import { HOST_SERVER } from '@/app/const';
 import { Toast } from '@/components/Toast';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
@@ -12,6 +12,7 @@ import Link from 'next/link';
 export default function Login() {
     const router = useRouter();
     const searchParams = useSearchParams();
+
     const [userInfo, setUserInfo] = useState({
         username: '',
         password: '',
@@ -135,9 +136,9 @@ export default function Login() {
                 <Card
                     title="Bienvenido de nuevo"
                     description="Ingresa tus credenciales para acceder a tu cuenta"
-                    icon="A"
+                    icon="M"
                 >
-                    <form className="space-y-6" onSubmit={handleForm}>
+                    <form className="space-y-3 md:space-y-6" onSubmit={handleForm}>
                         <Input
                             label="Usuario o correo"
                             type="text"
@@ -169,7 +170,7 @@ export default function Login() {
                     </form>
                 </Card>
 
-                <p className="text-center text-slate-500 text-sm mt-8">
+                <p className="text-center text-slate-500 text-xs md:text-sm mt-8">
                     ¿No tienes una cuenta? <Link href="/register" className="text-blue-400 font-semibold hover:underline cursor-pointer">Crear cuenta</Link>
                 </p>
             </div>

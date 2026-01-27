@@ -184,7 +184,6 @@ export const Sidebar = ({ isOpen, setOpen, onLogout, user, children }: SidebarPr
                 }
             </header>
 
-
             {/* New Chat Button */}
             <button
                 onClick={createNewChat}
@@ -278,11 +277,11 @@ export const Sidebar = ({ isOpen, setOpen, onLogout, user, children }: SidebarPr
                     <div
                         onClick={() => !isOpen ? setIsDropdownOpen(!isDropdownOpen) : null}
 
-                        className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700">
+                        className="size-10 rounded-full bg-slate-800 border border-slate-700">
                         {user?.image ? (
-                            <img src={user.image} alt="User" className="w-full h-full rounded-full" />
+                            <img src={user.image} alt="User" className="size-full rounded-full" />
                         ) : (
-                            <div className="w-full h-full rounded-full flex items-center justify-center text-slate-400">
+                            <div className="size-full rounded-full flex items-center justify-center text-slate-400">
                                 {user?.username?.charAt(0).toUpperCase()}
                             </div>
                         )}

@@ -36,23 +36,11 @@ export const SidebarItem = ({
     onCopyLastMessage,
     onGallery
 }: SidebarItemProps) => {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const menuRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-                setIsMenuOpen(false);
-            }
-        };
-        if (isMenuOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [isMenuOpen]);
+    const { ref: menuRef, isDropdownOpen: isMenuOpen, setIsDropdownOpen: setIsMenuOpen } = useDropDown();
 
     return (
-        <div
+        <Link
+            href={`/dashboard`}
             onClick={onClick}
             className={`outline-transparent border  group flex items-center space-x-3 ${!isOpen ? "px-2 py-1.5 justify-center" : "px-4 py-3"} rounded-lg transition-all duration-200 relative ${active
                 ? 'bg-blue-600/20 text-blue-400 border-blue-500/30'
@@ -123,7 +111,7 @@ export const SidebarItem = ({
                     )}
                 </div>
             )}
-        </div>
+        </Link>
     );
 };
 
@@ -141,6 +129,7 @@ export const Sidebar = ({ isOpen, setOpen, onLogout, user, children }: SidebarPr
     const [galleryConversationTitle, setGalleryConversationTitle] = useState<string>("");
 
     const { conversations, currentConversationId, loadConversation, createNewChat, deleteConversation, isConversationsLoading } = useChat();
+
     const { ref: dropdownRef, isDropdownOpen, setIsDropdownOpen } = useDropDown();
 
     const handleUserInfoClick = () => {
@@ -152,6 +141,10 @@ export const Sidebar = ({ isOpen, setOpen, onLogout, user, children }: SidebarPr
     const handleLogoutClick = () => {
         setIsDropdownOpen(false);
         onLogout();
+    };
+
+    const goEccomerceManager = () => {
+        setIsDropdownOpen(false);
     };
 
     return (
@@ -173,13 +166,14 @@ export const Sidebar = ({ isOpen, setOpen, onLogout, user, children }: SidebarPr
             </header>
 
             {/* Eccomerce actions */}
-            <button
-                onClick={() => { }}
+            <Link
+                href="/dashboard/eccomerce-moncada"
+                onClick={goEccomerceManager}
                 className={`cursor-pointer flex items-center justify-center space-x-2 mb-4 p-3 rounded-lg transition-all duration-300 group shadow-lg bg-blue-600 hover:bg-blue-500 shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-white border border-blue-400/20 *: ${!isOpen ? 'w-8 h-8 self-center px-0' : 'w-full'}`}
             >
                 <Store size={24} className={`transition-transform duration-300 `} />
                 {isOpen && <span className="text-sm font-bold text-white tracking-wide">Tienda Moncada</span>}
-            </button>
+            </Link>
             {/* New Chat Button */}
             <button
                 onClick={createNewChat}

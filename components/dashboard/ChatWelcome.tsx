@@ -1,7 +1,7 @@
 'use client'
-import { useUser } from '@/components/Context/contextInfoUser'
+import { useUser } from '@/components/context/contextInfoUser'
 import { SquareActivity, Computer, Mails, Pencil } from 'lucide-react'
-import { useChat } from '@/components/Context/contextInfoChat'
+import { useChat } from '@/components/context/contextInfoChat'
 
 export default function WelcomeChat() {
     // conextos

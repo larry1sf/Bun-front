@@ -1,6 +1,6 @@
 'use client'
-import { useUser } from "@/components/Context/contextInfoUser"
-import { useChat } from "@/components/Context/contextInfoChat"
+import { useUser } from "@/components/context/contextInfoUser"
+import { useChat } from "@/components/context/contextInfoChat"
 import { useRef, useEffect } from "react"
 import Markdown from "react-markdown"
 import Image from "next/image"

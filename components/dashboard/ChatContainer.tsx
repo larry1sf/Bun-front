@@ -1,5 +1,5 @@
 'use client'
-import { useChat } from "@/components/Context/contextInfoChat";
+import { useChat } from "@/components/context/contextInfoChat";
 import ChatWelcome from "@/components/dashboard/ChatWelcome";
 import ChatBubble from "@/components/dashboard/ChatBubble";
 import ChatMessageSkeleton from "./ChatMessageSkeleton";

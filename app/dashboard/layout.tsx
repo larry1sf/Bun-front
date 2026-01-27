@@ -1,6 +1,6 @@
 
 import SidebarClient from '@/components/dashboard/SidebarClient'
-import { UserProvider } from "@/components/Context/contextInfoUser"
+import { UserProvider } from "@/components/context/contextInfoUser"
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { HOST_SERVER } from "@/app/const"

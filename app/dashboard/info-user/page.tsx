@@ -1,5 +1,5 @@
 'use client'
-import { useUser } from "@/components/Context/contextInfoUser"
+import { useUser } from "@/components/context/contextInfoUser"
 import { Card } from "@/components/ui/Card"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"

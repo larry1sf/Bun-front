@@ -4,8 +4,8 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { Sidebar } from '@/components/dashboard/Sidebar'
-import { useUser } from '@/components/Context/contextInfoUser'
-import { ChatProvider } from '@/components/Context/contextInfoChat'
+import { useUser } from '@/components/context/contextInfoUser'
+import { ChatProvider } from '@/components/context/contextInfoChat'
 
 
 export default function SidebarClient({ children }: { children: React.ReactNode }) {

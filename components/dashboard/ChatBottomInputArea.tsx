@@ -1,7 +1,7 @@
 'use client'
 import { Images, Paperclip, X, Check, Plus } from "lucide-react";
 import { ChatSendButton } from "./ChatSendButton";
-import { useChat } from "../Context/contextInfoChat";
+import { useChat } from "../context/contextInfoChat";
 import { Message } from "@/types";
 import { useEffect, useState } from "react";
 

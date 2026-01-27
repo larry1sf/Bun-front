@@ -2,12 +2,12 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { Ellipsis, LogOut, User, MessageSquare, Plus, PanelLeftClose } from 'lucide-react';
+import { Ellipsis, LogOut, User, MessageSquare, Plus, PanelLeftClose, Store } from 'lucide-react';
 import { User as UserType } from '@/types';
-
-import { useChat } from '@/components/Context/contextInfoChat';
+import { useChat } from '@/components/context/contextInfoChat';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
-import { GalleryModal } from './GalleryModal';
+import { GalleryModal } from '@/components/dashboard/GalleryModal';
+import { useDropDown } from '@/components/hooks/dropDown';
 
 interface SidebarItemProps {
     id: string;
@@ -136,24 +136,12 @@ interface SidebarProps {
 }
 
 export const Sidebar = ({ isOpen, setOpen, onLogout, user, children }: SidebarProps) => {
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [conversationToDelete, setConversationToDelete] = useState<string | null>(null);
     const [galleryConversationId, setGalleryConversationId] = useState<string | null>(null);
     const [galleryConversationTitle, setGalleryConversationTitle] = useState<string>("");
-    const dropdownRef = useRef<HTMLDivElement>(null);
+
     const { conversations, currentConversationId, loadConversation, createNewChat, deleteConversation, isConversationsLoading } = useChat();
-
-    // Close dropdown when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setIsDropdownOpen(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    const { ref: dropdownRef, isDropdownOpen, setIsDropdownOpen } = useDropDown();
 
     const handleUserInfoClick = () => {
         setIsDropdownOpen(false);
@@ -184,10 +172,18 @@ export const Sidebar = ({ isOpen, setOpen, onLogout, user, children }: SidebarPr
                 }
             </header>
 
+            {/* Eccomerce actions */}
+            <button
+                onClick={() => { }}
+                className={`cursor-pointer flex items-center justify-center space-x-2 mb-4 p-3 rounded-lg transition-all duration-300 group shadow-lg bg-blue-600 hover:bg-blue-500 shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-white border border-blue-400/20 *: ${!isOpen ? 'w-8 h-8 self-center px-0' : 'w-full'}`}
+            >
+                <Store size={24} className={`transition-transform duration-300 `} />
+                {isOpen && <span className="text-sm font-bold text-white tracking-wide">Tienda Moncada</span>}
+            </button>
             {/* New Chat Button */}
             <button
                 onClick={createNewChat}
-                className={`cursor-pointer flex items-center justify-center space-x-2 mb-6 p-3 rounded-lg transition-all duration-300 group shadow-lg ${!isOpen ? 'w-8 h-8 self-center px-0' : 'w-full'} bg-blue-600 hover:bg-blue-500 shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-white border border-blue-400/20`}
+                className={`cursor-pointer flex items-center justify-center space-x-2 mb-4 p-3 rounded-lg transition-all duration-300 group shadow-lg ${!isOpen ? 'w-8 h-8 self-center px-0' : 'w-full'} bg-blue-600 hover:bg-blue-500 shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-white border border-blue-400/20`}
             >
                 <Plus className={`transition-transform duration-300 ${isOpen ? 'group-hover:rotate-90' : ''}`} size={24} strokeWidth={2.5} />
                 {isOpen && <span className="text-sm font-bold text-white tracking-wide">Nuevo Chat</span>}

@@ -1,5 +1,6 @@
 'use client'
-import { Images, Paperclip, X, Check, Square } from "lucide-react";
+import { Images, Paperclip, X, Check, Plus } from "lucide-react";
+import { ChatSendButton } from "./ChatSendButton";
 import { useChat } from "../Context/contextInfoChat";
 import { Message } from "@/types";
 import { useEffect, useState } from "react";
@@ -18,11 +19,29 @@ export default function ChatBottomInputArea() {
     // estados
     const [selectedImages, setSelectedImages] = useState<ImageFile[]>([])
     const [isVisionEnabled, setIsVisionEnabled] = useState(false)
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const [showToast, setShowToast] = useState(false)
     // referencias
     const refTextArea = useRef<HTMLTextAreaElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const abortControllerRef = useRef<AbortController | null>(null)
+    const menuRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setIsMobileMenuOpen(false);
+            }
+        };
+
+        if (isMobileMenuOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isMobileMenuOpen]);
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
@@ -71,11 +90,16 @@ export default function ChatBottomInputArea() {
         abortControllerRef.current = controller
         const messageContent = {
             role: "system",
-            content: `Responde en Markdown bien estructurado:
-- Usa títulos (##)
+            content: `
+Responde en Markdown bien estructurado:
+- Usa títulos  con (#) decendentes
 - Usa listas
 - Usa bloques de código cuando sea necesario
 - No expliques el Markdown, solo úsalo
+- Usa tablas cuando sea necesario
+- Usa citas cuando sea necesario
+- No uses enlaces
+- Responde siempre en español
 `
         }
         fetch('/api/dashboard/chat', {
@@ -155,13 +179,17 @@ export default function ChatBottomInputArea() {
         fileInputRef.current?.click()
     }
 
-    useEffect(() => {
-        console.log('showToast', showToast)
-    }, [showToast])
-
     return (
-        <div className="sticky bottom-0 w-full px-6 pb-4 pt-20 bg-linear-to-t from-slate-950 via-slate-950/90 via-60% to-transparent pointer-events-none shadow-[0_1px_0_0_rgb(2,6,23)] focus:shadow-[0_2px_0_0_rgb(2,6,23)]">
-            {showToast && <Toast variant="error" duration={2000} message={`No puedes agregar archivos sin activar la vision`} onClose={() => setShowToast(false)} />}
+        <div className="sticky bottom-0 w-full md:px-6 px-4 pb-4 pt-20 bg-linear-to-t from-slate-950 via-slate-950/90 via-60% to-transparent pointer-events-none shadow-[0_1px_0_0_rgb(2,6,23)] focus:shadow-[0_2px_0_0_rgb(2,6,23)]">
+            {
+                showToast && (
+                    <Toast
+                        variant="error"
+                        duration={2000}
+                        message={`No puedes agregar archivos sin activar la vision`}
+                        onClose={() => setShowToast(false)} />
+                )
+            }
             <div className="max-w-3xl mx-auto relative group pointer-events-auto">
                 {/* Background Blur */}
                 <div className="absolute -inset-1 bg-linear-to-r from-blue-600/20 to-indigo-600/20 rounded-3xl blur opacity-25 group-focus-within:opacity-50 transition-opacity"></div>
@@ -169,14 +197,16 @@ export default function ChatBottomInputArea() {
                 {/* Main Container */}
                 <div className={`
                     ${isLoading ? 'border-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.15)] ring-1 ring-blue-500/20' : 'border-white/10 shadow-xl'} 
-                    relative flex flex-col bg-slate-900/95 border backdrop-blur-3xl rounded-4xl overflow-hidden focus-within:border-blue-500/40 focus-within:shadow-[0_0_25px_rgba(59,130,246,0.1)] transition-all duration-500
+                    relative flex flex-col bg-slate-900/95 border backdrop-blur-3xl rounded-4xl overflow-visible focus-within:border-blue-500/40 focus-within:shadow-[0_0_25px_rgba(59,130,246,0.1)] transition-all duration-500
                 `}>
                     {/* Animated Loading Bar (Only visible when loading) */}
                     {isLoading && (
-                        <div className="absolute top-0 left-0 right-0 h-[2px] bg-linear-to-r from-transparent via-blue-500 to-transparent animate-shimmer z-10"></div>
+                        <div className="absolute overflow-hidden px-4 md:px-6 top-0 left-0 right-0 size-full rounded-4xl">
+                            <div className="absolute px-4 md:px-6 top-0 left-0 right-0 h-[2px] bg-linear-to-r from-transparent via-blue-500 to-transparent animate-shimmer z-10"></div>
+                        </div>
                     )}
 
-                    {/* Preview Area (Inside) */}
+                    {/* Preview images Area (Inside) */}
                     {(isVisionEnabled && selectedImages.length > 0) && (
                         <div className="flex flex-wrap gap-3 p-4 pb-2 animate-in fade-in slide-in-from-top-2 duration-300">
                             {selectedImages.map((img, index) => (
@@ -210,17 +240,99 @@ export default function ChatBottomInputArea() {
                                 placeholder={isLoading ? "La IA está procesando..." : "Escribe un mensaje..."}
                                 wrap="soft"
                                 className={`
-                                    w-full bg-transparent border-none focus:ring-0 text-slate-100 placeholder-slate-500/80 py-4 px-2 resize-none min-w-0 whitespace-pre-wrap wrap-break-word custom-scrollbar outline-none text-[15px] field-sizing-content h-auto max-h-60 overflow-y-auto transition-opacity duration-300
+                                    w-full bg-transparent border-none focus:ring-0 text-slate-100 placeholder-slate-500/80 py-4 px-2 resize-none min-w-0 whitespace-pre-wrap wrap-break-word custom-scrollbar outline-none text-sm md:text-base field-sizing-content h-auto max-h-60 overflow-y-auto transition-opacity duration-300
                                     ${isLoading ? 'opacity-50 select-none' : 'opacity-100'}
                                 `}
                             />
                         </div>
 
-                        {/* Actions Row */}
-                        <div className="flex items-center justify-between px-5 pb-4">
+                        {/* Actions Row Mobile */}
+                        <div className="md:hidden flex items-center justify-between px-5 pb-4 relative">
+                            {/* Menu Dropdown & Toggle */}
+                            <div className="flex items-center gap-2" ref={menuRef}>
+                                <div className="relative">
+                                    {/* Dropdown Menu */}
+                                    <div className={`
+                                        absolute bottom-full left-0 mb-3 flex flex-col gap-2 transition-all duration-300 origin-bottom-left z-20
+                                        ${isMobileMenuOpen
+                                            ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
+                                            : 'opacity-0 translate-y-4 scale-95 pointer-events-none'
+                                        }
+                                    `}>
+                                        <div className="p-2 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl flex flex-col gap-2 min-w-[140px]">
+                                            {/* Vision Toggle */}
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const newValue = !isVisionEnabled;
+                                                    setIsVisionEnabled(newValue);
+                                                    if (!newValue) setSelectedImages([]);
+                                                }}
+                                                className={`
+                                                    w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
+                                                    ${isVisionEnabled
+                                                        ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30'
+                                                        : 'hover:bg-white/5 text-slate-400 border border-transparent'
+                                                    }
+                                                `}
+                                            >
+                                                <div className={`
+                                                    flex items-center justify-center w-5 h-5 rounded-md transition-all duration-300
+                                                    ${isVisionEnabled ? 'bg-blue-500 text-white rotate-0 scale-100' : 'bg-slate-700/50 text-slate-500'}
+                                                `}>
+                                                    {isVisionEnabled ? <Check size={14} strokeWidth={3} /> : <div className="w-1.5 h-1.5 rounded-full bg-slate-500" />}
+                                                </div>
+                                                <span className="text-xs font-semibold tracking-wide">Visión</span>
+                                            </button>
+
+                                            {/* Upload Image */}
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    handleClickNoActive();
+                                                }}
+                                                className={`
+                                                    w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
+                                                    ${isVisionEnabled
+                                                        ? 'text-slate-200 hover:bg-white/5'
+                                                        : 'text-slate-500 hover:text-slate-400 cursor-not-allowed opacity-60'
+                                                    }
+                                                `}
+                                            >
+                                                <Paperclip size={18} />
+                                                <span className="text-xs font-medium">Adjuntar</span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Toggle Button */}
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                        className={`
+                                            flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 border
+                                            ${isMobileMenuOpen
+                                                ? 'bg-blue-600/20 border-blue-500/50 text-blue-400 rotate-90'
+                                                : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                                            }
+                                        `}
+                                    >
+                                        <Plus size={22} className={`transition-transform duration-300 ${isMobileMenuOpen ? 'rotate-45' : 'rotate-0'}`} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Send Button Mobile */}
+                            <ChatSendButton
+                                onClick={handleSend}
+                                isLoading={isLoading}
+                                isDisabled={(!refTextArea.current?.value && selectedImages.length === 0) && !isLoading}
+                            />
+                        </div>
+
+                        {/* Actions Row Desktop*/}
+                        <div className="hidden md:flex items-center justify-between px-5 pb-4">
                             <div className="flex items-center space-x-3">
-
-
                                 <button
                                     type="button"
                                     onClick={() => {
@@ -284,33 +396,18 @@ export default function ChatBottomInputArea() {
                             </div>
 
                             <div className="flex items-center">
-                                <button
+                                <ChatSendButton
                                     onClick={handleSend}
-                                    disabled={(!refTextArea.current?.value && selectedImages.length === 0) && !isLoading}
-                                    className={`
-                                        cursor-pointer p-3 rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-lg 
-                                        ${isLoading
-                                            ? 'bg-red-500/20 text-red-500 border border-red-500/30 shadow-red-500/10 hover:bg-red-500/30'
-                                            : 'bg-blue-600 text-white hover:bg-blue-500 shadow-blue-500/30'
-                                        }
-                                        disabled:opacity-40 disabled:scale-100 disabled:bg-blue-600 disabled:cursor-not-allowed disabled:border-transparent
-                                    `}
-                                >
-                                    {isLoading ? (
-                                        <Square size={18} fill="currentColor" className="animate-pulse" />
-                                    ) : (
-                                        <svg viewBox="0 0 24 24" fill="currentColor" className="w-5.5 h-5.5 -rotate-45">
-                                            <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
-                                        </svg>
-                                    )}
-                                </button>
+                                    isLoading={isLoading}
+                                    isDisabled={(!refTextArea.current?.value && selectedImages.length === 0) && !isLoading}
+                                />
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Legal Notice */}
-                <p className="text-sm text-slate-400 text-center mt-3 font-medium opacity-60">
+                <p className=" text-xs md:text-sm text-slate-400 text-center mt-3 font-medium opacity-60">
                     MoIA puede cometer errores. Considera verificar la información importante.
                 </p>
             </div>

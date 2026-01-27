@@ -1,1 +1,1 @@
-export const HOST_SERVER = typeof window === 'undefined' ? (process.env.HOST_SERVER || '') : '/server'
+export const HOST_SERVER = process.env.HOST_SERVER || 'http://localhost:8080'

@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { HOST_SERVER } from '@/app/const';
+
 import { Toast } from '@/components/Toast';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
@@ -27,7 +27,7 @@ export default function Login() {
     })
 
     useEffect(() => {
-        fetch(`${HOST_SERVER}/login`, {
+        fetch('/api/login', {
             credentials: "include"
         })
             .then((res) => {
@@ -58,7 +58,7 @@ export default function Login() {
         }
 
         try {
-            const response = await fetch(`${HOST_SERVER}/login`, {
+            const response = await fetch('/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

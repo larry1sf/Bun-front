@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
-import { HOST_SERVER } from '../const';
+
 import { Toast } from '@/components/Toast';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
@@ -28,7 +28,7 @@ export default function Register() {
         if (hasFetched.current) return;
         hasFetched.current = true;
 
-        fetch(`${HOST_SERVER}/register`, {
+        fetch('/api/register', {
             credentials: "include"
         })
             .then(res => {
@@ -111,7 +111,7 @@ export default function Register() {
         }
 
         try {
-            const response = await fetch(`${HOST_SERVER}/register`, {
+            const response = await fetch('/api/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

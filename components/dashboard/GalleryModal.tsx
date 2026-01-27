@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Download, ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
-import { HOST_SERVER } from '@/app/const';
+
 import { Message } from '@/types';
 
 interface GalleryModalProps {
@@ -43,7 +43,7 @@ export const GalleryModal = ({ isOpen, onClose, conversationId, conversationTitl
     const fetchImages = async () => {
         try {
             setLoading(true);
-            const res = await fetch(`${HOST_SERVER}/dashboard/conversation?id=${conversationId}`, { credentials: "include" });
+            const res = await fetch(`/api/dashboard/conversation?id=${conversationId}`, { credentials: "include" });
             if (res.ok) {
                 const data = await res.json();
                 const extractedImages: GalleryImage[] = [];
@@ -189,7 +189,7 @@ export const GalleryModal = ({ isOpen, onClose, conversationId, conversationTitl
             {/* Lightbox / Slider overlay */}
             {selectedImageIndex !== null && (
                 <div
-                    className="fixed inset-0 z-[70] bg-slate-950/95 backdrop-blur-lg flex items-center justify-center animate-in fade-in duration-300 cursor-zoom-out"
+                    className="fixed inset-0 z-70 bg-slate-950/95 backdrop-blur-lg flex items-center justify-center animate-in fade-in duration-300 cursor-zoom-out"
                     onClick={() => setSelectedImageIndex(null)}
                 >
                     {/* Close button */}

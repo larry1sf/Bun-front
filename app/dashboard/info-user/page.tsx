@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { User, Mail, Edit2, Save, X, Key, AlertCircle, Camera, Shield, ArrowLeft, Loader } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
-import { HOST_SERVER } from "@/app/const"
+
 import Link from "next/link"
 import Spinner from "@/components/Spinner"
 
@@ -61,7 +61,7 @@ export default function InfoUser() {
 
     const handleUpdateUser = async () => {
         try {
-            const res = await fetch(`${HOST_SERVER}/update-user`, {
+            const res = await fetch('/api/update-user', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -241,10 +241,15 @@ export default function InfoUser() {
                                 {!isEditing && (
                                     <div className="w-full pt-4 border-t border-slate-800/50">
                                         <div className="text-xs text-slate-500 uppercase tracking-widest mb-2 font-semibold">Estado</div>
-                                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                                            Verificado
-                                        </div>
+                                        {
+                                            user.securityPhrase?.length ? (<div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                                Verificado
+                                            </div>) : (<div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500/70 text-xs font-bold uppercase text-nowrap">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-amber-500/70 animate-pulse" />
+                                                Sin verificar
+                                            </div>)
+                                        }
                                     </div>
                                 )}
                             </Card>

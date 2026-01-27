@@ -1,6 +1,6 @@
 "use client"
 import { Message, Conversation } from "@/types";
-import { HOST_SERVER } from "@/app/const";
+
 import { createContext, useContext, useState, useEffect, Dispatch, SetStateAction } from "react"
 
 const ChatContext = createContext<{
@@ -51,7 +51,7 @@ export const ChatProvider = ({ initialValue, children }: { initialValue: Message
             // Only set loading if we don't have conversations yet (initial load)
             if (conversations.length === 0) setIsConversationsLoading(true);
 
-            const res = await fetch(`${HOST_SERVER}/dashboard/conversations`, { credentials: "include" });
+            const res = await fetch('/api/dashboard/conversations', { credentials: "include" });
             if (res.ok) setConversations(await res.json());
         } catch (e) {
             console.error("Failed to load conversations", e);
@@ -63,7 +63,7 @@ export const ChatProvider = ({ initialValue, children }: { initialValue: Message
     const loadConversation = async (id: string) => {
         try {
             setIsMessagesLoading(true);
-            const res = await fetch(`${HOST_SERVER}/dashboard/conversation?id=${id}`, { credentials: "include" });
+            const res = await fetch(`/api/dashboard/conversation?id=${id}`, { credentials: "include" });
             if (res.ok) {
                 const data = await res.json();
                 setMessages(data.messages || []);
@@ -87,7 +87,7 @@ export const ChatProvider = ({ initialValue, children }: { initialValue: Message
 
     const deleteConversation = async (id: string) => {
         try {
-            const res = await fetch(`${HOST_SERVER}/dashboard/conversation?id=${id}`, {
+            const res = await fetch(`/api/dashboard/conversation?id=${id}`, {
                 method: 'DELETE',
                 credentials: "include"
             });

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { HOST_SERVER } from '../const'
+
 import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
@@ -29,7 +29,7 @@ export default function ReStorePage() {
         setMessage(null)
 
         try {
-            const response = await fetch(`${HOST_SERVER}/check-user`, {
+            const response = await fetch('/api/check-user', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ export default function ReStorePage() {
         setMessage(null)
 
         try {
-            const response = await fetch(`${HOST_SERVER}/verify-phrase`, {
+            const response = await fetch('/api/verify-phrase', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -118,7 +118,7 @@ export default function ReStorePage() {
         setMessage(null)
 
         try {
-            const response = await fetch(`${HOST_SERVER}/update-password`, {
+            const response = await fetch('/api/update-password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

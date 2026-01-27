@@ -3,7 +3,7 @@ import { Images, Paperclip, X, Check, Square } from "lucide-react";
 import { useChat } from "../Context/contextInfoChat";
 import { Message } from "@/types";
 import { useEffect, useState } from "react";
-import { HOST_SERVER } from "@/app/const";
+
 import { useRef, ChangeEvent } from "react";
 import { Toast } from "@/app/components/Toast";
 
@@ -78,7 +78,7 @@ export default function ChatBottomInputArea() {
 - No expliques el Markdown, solo úsalo
 `
         }
-        fetch(`${HOST_SERVER}/dashboard/chat`, {
+        fetch('/api/dashboard/chat', {
             method: 'POST',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },

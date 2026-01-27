@@ -2,9 +2,9 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { Ellipsis, LogOut, User, MessageSquare, Plus } from 'lucide-react';
+import { Ellipsis, LogOut, User, MessageSquare, Plus, PanelLeftClose } from 'lucide-react';
 import { User as UserType } from '@/types';
-import { HOST_SERVER } from '@/app/const';
+
 import { useChat } from '@/components/Context/contextInfoChat';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { GalleryModal } from './GalleryModal';
@@ -54,7 +54,7 @@ export const SidebarItem = ({
     return (
         <div
             onClick={onClick}
-            className={`outline-transparent border  group flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 relative ${active
+            className={`outline-transparent border  group flex items-center space-x-3 ${!isOpen ? "px-2 py-1.5 justify-center" : "px-4 py-3"} rounded-lg transition-all duration-200 relative ${active
                 ? 'bg-blue-600/20 text-blue-400 border-blue-500/30'
                 : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border-transparent'
                 } ${onClick
@@ -167,22 +167,34 @@ export const Sidebar = ({ isOpen, setOpen, onLogout, user, children }: SidebarPr
     };
 
     return (
-        <aside className={`${isOpen ? 'w-72' : 'w-20'} bg-slate-950/50 border-r border-slate-900 transition-all duration-500 flex flex-col p-4 z-0 h-screen`}>
-            <Link href="/dashboard" className="flex items-center space-x-3 px-2 w-fit mb-6 h-10">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/20">M</div>
-                {isOpen && <span className="text-xl font-bold bg-linear-to-r from-white to-slate-400 bg-clip-text text-transparent">MoIA</span>}
-            </Link>
+        <aside className={`${isOpen ? 'w-72' : 'w-20'} bg-slate-950/50 border-r border-slate-900 transition-all duration-500 flex flex-col p-4 z-10 h-screen`}>
+            <header className="flex items-center justify-between mb-6">
+                <button
+                    onClick={() => setOpen(!isOpen)}
+                    className="flex items-center space-x-3 px-2 w-fit h-10">
+                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/20">M</div>
+                    {isOpen && <span className="text-xl font-bold bg-linear-to-r from-white to-slate-400 bg-clip-text text-transparent">MoIA</span>}
+                </button>
+                {
+                    isOpen && (
+                        <button onClick={() => setOpen(!isOpen)}>
+                            <PanelLeftClose className={`text-white `} size={24} />
+                        </button>
+                    )
+                }
+            </header>
+
 
             {/* New Chat Button */}
             <button
                 onClick={createNewChat}
-                className={`cursor-pointer flex items-center justify-center space-x-2 mb-6 p-3 rounded-xl transition-all duration-300 group shadow-lg ${!isOpen ? 'w-12 h-12 self-center px-0' : 'w-full'} bg-blue-600 hover:bg-blue-500 shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-white border border-blue-400/20`}
+                className={`cursor-pointer flex items-center justify-center space-x-2 mb-6 p-3 rounded-lg transition-all duration-300 group shadow-lg ${!isOpen ? 'w-8 h-8 self-center px-0' : 'w-full'} bg-blue-600 hover:bg-blue-500 shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-white border border-blue-400/20`}
             >
                 <Plus className={`transition-transform duration-300 ${isOpen ? 'group-hover:rotate-90' : ''}`} size={24} strokeWidth={2.5} />
                 {isOpen && <span className="text-sm font-bold text-white tracking-wide">Nuevo Chat</span>}
             </button>
 
-            <nav className="flex-1 space-y-1 overflow-y-auto custom-scrollbar">
+            <nav className={`flex-1 space-y-1 overflow-y-auto custom-scrollbar ${!isOpen ? 'w-8 h-8 self-center' : 'w-full'}`}>
                 {isOpen && (
                     <div className="px-2 mb-2">
                         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Recientes</p>
@@ -211,7 +223,7 @@ export const Sidebar = ({ isOpen, setOpen, onLogout, user, children }: SidebarPr
                                 isOpen={isOpen}
                                 onDelete={() => setConversationToDelete(conv.id)}
                                 onExportJson={() => {
-                                    fetch(`${HOST_SERVER}/dashboard/conversation?id=${conv.id}`, { credentials: "include" })
+                                    fetch(`/api/dashboard/conversation?id=${conv.id}`, { credentials: "include" })
                                         .then(res => res.json())
                                         .then(data => {
                                             const blob = new Blob([JSON.stringify(data.messages, null, 2)], { type: 'application/json' });
@@ -225,7 +237,7 @@ export const Sidebar = ({ isOpen, setOpen, onLogout, user, children }: SidebarPr
                                         .catch(err => console.error("Export failed", err));
                                 }}
                                 onCopyLastMessage={() => {
-                                    fetch(`${HOST_SERVER}/dashboard/conversation?id=${conv.id}`, { credentials: "include" })
+                                    fetch(`/api/dashboard/conversation?id=${conv.id}`, { credentials: "include" })
                                         .then(res => res.json())
                                         .then(data => {
                                             const messages = data.messages || [];
@@ -263,7 +275,10 @@ export const Sidebar = ({ isOpen, setOpen, onLogout, user, children }: SidebarPr
             <div className="mt-auto px-2 py-4 border-t border-slate-900 relative" ref={dropdownRef}>
                 <div className="flex items-center space-x-3">
                     {/* imagen del usuario */}
-                    <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700">
+                    <div
+                        onClick={() => !isOpen ? setIsDropdownOpen(!isDropdownOpen) : null}
+
+                        className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700">
                         {user?.image ? (
                             <img src={user.image} alt="User" className="w-full h-full rounded-full" />
                         ) : (
@@ -298,8 +313,8 @@ export const Sidebar = ({ isOpen, setOpen, onLogout, user, children }: SidebarPr
                     )}
                 </div>
 
-                {isOpen && isDropdownOpen && (
-                    <div className="absolute bottom-full left-2 right-2 mb-2 bg-slate-900 border border-slate-800 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-200">
+                {isDropdownOpen && (
+                    <div className="absolute bottom-full left-2 right-2 mb-2 bg-slate-900 border border-slate-800 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-200 min-w-52">
                         <Link href="/dashboard/info-user"
                             onClick={handleUserInfoClick}
                             className="w-full flex items-center space-x-3 px-4 py-3 text-sm text-slate-300 hover:bg-slate-800/50 transition-colors cursor-pointer"

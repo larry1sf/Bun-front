@@ -20,7 +20,7 @@ export const Input = ({
         <div className="space-y-2 w-full">
             {label && (
                 <div className="flex justify-between items-center px-1">
-                    <label htmlFor={id} className="text-sm font-medium text-slate-300 ml-1 block">
+                    <label htmlFor={id} className="text-xs md:text-sm font-medium text-slate-300 ml-1 block">
                         {label}
                     </label>
                     {rightElement}

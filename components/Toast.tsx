@@ -38,7 +38,7 @@ export const Toast = ({ message, variant = 'info', duration = 3000, onClose }: T
                 {variant === 'loading' && (
                     <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                 )}
-                <span className="text-sm font-medium">{message}</span>
+                <span className="text-sm font-medium text-center md:text-start">{message}</span>
             </div>
         </div>
     );

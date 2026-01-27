@@ -310,14 +310,14 @@ Responde en Markdown bien estructurado:
                                         type="button"
                                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                                         className={`
-                                            flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 border
+                                            flex items-center justify-center p-3 rounded-2xl transition-all duration-300 border
                                             ${isMobileMenuOpen
                                                 ? 'bg-blue-600/20 border-blue-500/50 text-blue-400 rotate-90'
                                                 : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
                                             }
                                         `}
                                     >
-                                        <Plus size={22} className={`transition-transform duration-300 ${isMobileMenuOpen ? 'rotate-45' : 'rotate-0'}`} />
+                                        <Plus size={20} className={`transition-transform duration-300 ${isMobileMenuOpen ? 'rotate-45' : 'rotate-0'}`} />
                                     </button>
                                 </div>
                             </div>

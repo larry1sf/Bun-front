@@ -24,7 +24,6 @@ interface SidebarItemProps {
 }
 
 export const SidebarItem = ({
-    id,
     icon,
     label,
     active = false,

@@ -8,7 +8,11 @@ async function proxy(request: NextRequest, { params }: { params: Promise<{ proxy
     const targetUrl = `${HOST_SERVER}/${path}${query}`;
 
     try {
-        const body = request.method !== 'GET' && request.method !== 'HEAD' ? await request.blob() : null;
+        const body =
+            request.method !== 'GET'
+                && request.method !== 'HEAD'
+                ? await request.blob()
+                : null;
 
         const response = await fetch(targetUrl, {
             method: request.method,
@@ -18,9 +22,7 @@ async function proxy(request: NextRequest, { params }: { params: Promise<{ proxy
             duplex: 'half', // Required for streaming responses
         });
 
-        const data = await response.blob();
-
-        return new NextResponse(data, {
+        return new NextResponse(response.body, {
             status: response.status,
             statusText: response.statusText,
             headers: response.headers,

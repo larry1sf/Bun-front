@@ -23,3 +23,13 @@ export interface Conversation {
     title: string;
     date: string;
 }
+
+export interface tform {
+    name: string,
+    categoria: string,
+    genero: string,
+    clothing_type: string,
+    price_min: number,
+    price_max: number,
+    sort: "" | "price_asc" | "price_desc" | "newest"
+}

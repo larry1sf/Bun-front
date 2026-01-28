@@ -38,32 +38,27 @@ export const Select = ({
     ...props
 }: SelectProps) => {
     const { ref: containerRef, isDropdownOpen: isOpen, setIsDropdownOpen: setIsOpen } = useDropDown()
-    const [selectedValue, setSelectedValue] = useState(value || '');
 
-    // Update internal state if controlled value changes
-    useEffect(() => {
-        if (value !== undefined) {
-            setSelectedValue(value);
-        }
-    }, [value]);
+    // Usamos el valor de props directamente o un string vacío si es undefined
+    const displayValue = value ?? "";
 
     const handleSelect = (optionValue: string) => {
         if (disabled) return;
-
-        setSelectedValue(optionValue);
         setIsOpen(false);
-
         if (onChange) {
             onChange(optionValue);
         }
     };
 
-    const selectedOption = options.find(opt => opt.value === selectedValue);
+    // Búsqueda insensible a mayúsculas/minúsculas para coincidir con la IA
+    const selectedOption = options.find(opt =>
+        opt.value.toLowerCase() === displayValue.toLowerCase()
+    );
 
     return (
         <div className="space-y-2 w-full" ref={containerRef}>
             {/* Hidden input for form submission */}
-            {name && <input type="hidden" name={name} value={selectedValue} />}
+            {name && <input type="hidden" name={name} value={displayValue} />}
 
             {label && (
                 <div className="flex justify-between items-center px-1">
@@ -93,8 +88,8 @@ export const Select = ({
                     `}
                     {...props}
                 >
-                    <span className={`truncate max-w-[100px] ${selectedValue ? 'text-slate-100' : 'text-slate-600'}`}>
-                        {selectedOption ? selectedOption.label : placeholder}
+                    <span className={`truncate max-w-[100px] ${displayValue ? 'text-slate-100' : 'text-slate-600'}`}>
+                        {selectedOption ? selectedOption.label : (displayValue || placeholder)}
                     </span>
                     <ChevronDown
                         className={`w-5 h-5 text-slate-500 transition-transform duration-200 ${isOpen ? 'transform rotate-180' : ''}`}
@@ -111,7 +106,7 @@ export const Select = ({
                                     onClick={() => handleSelect(option.value)}
                                     className={`
                                         px-5 py-3 text-sm cursor-pointer transition-colors duration-150
-                                        ${selectedValue === option.value
+                                        ${displayValue === option.value
                                             ? 'bg-blue-600/10 text-blue-400 font-medium'
                                             : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                                         }

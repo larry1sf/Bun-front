@@ -2,13 +2,13 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Ellipsis, LogOut, User, MessageSquare, Plus, PanelLeftClose, Store } from 'lucide-react';
+import { Ellipsis, LogOut, User, MessageSquare, Plus, PanelLeftClose, Store, Download, Image, Copy, Trash2 } from 'lucide-react';
 import { User as UserType } from '@/types';
 import { useChat } from '@/components/context/contextInfoChat';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { GalleryModal } from '@/components/dashboard/GalleryModal';
-import { useDropDown } from '@/components/hooks/dropDown';
 import { useRouter } from 'next/navigation';
+import { DropdownMenu } from '@/components/ui/DropdownMenu';
 
 interface SidebarItemProps {
     id: string;
@@ -37,8 +37,6 @@ export const SidebarItem = ({
     onGallery
 }: SidebarItemProps) => {
     const router = useRouter()
-    const { ref: menuRef, isDropdownOpen: isMenuOpen, setIsDropdownOpen: setIsMenuOpen } = useDropDown();
-
     const handleLinkClick = () => {
         onClick?.()
         router.push(`/dashboard`)
@@ -58,63 +56,40 @@ export const SidebarItem = ({
             <span className="text-xl shrink-0">{icon}</span>
             {isOpen && <span className="font-medium whitespace-nowrap truncate text-sm flex-1">{label}</span>}
             {isOpen && (
-                <div className="relative" ref={menuRef}>
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setIsMenuOpen(!isMenuOpen);
-                        }}
-                        className={`opacity-0 cursor-pointer border border-white/10 group-hover:opacity-100 p-1.5 hover:bg-slate-700/50 text-slate-500 hover:text-slate-200 rounded-lg transition-all duration-300 backdrop-blur-sm ${isMenuOpen ? 'opacity-100 bg-slate-700/50' : ''}`}
-                    >
-                        <Ellipsis size={16} />
-                    </button>
-
-                    {isMenuOpen && (
-                        <div className="absolute top-full right-0 mt-2 w-48 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-right-2 duration-200">
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    onExportJson?.();
-                                    setIsMenuOpen(false);
-                                }}
-                                className="w-full text-left px-4 py-2.5 text-xs text-slate-300 hover:bg-slate-800/50 transition-colors flex items-center space-x-2 cursor-pointer"
-                            >
-                                <span className="shrink-0">Exportar como JSON</span>
-                            </button>
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    onGallery?.();
-                                    setIsMenuOpen(false);
-                                }}
-                                className="w-full text-left px-4 py-2.5 text-xs text-slate-300 hover:bg-slate-800/50 transition-colors flex items-center space-x-2 cursor-pointer"
-                            >
-                                <span className="shrink-0">Galería</span>
-                            </button>
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    onCopyLastMessage?.();
-                                    setIsMenuOpen(false);
-                                }}
-                                className="w-full text-left px-4 py-2.5 text-xs text-slate-300 hover:bg-slate-800/50 transition-colors flex items-center space-x-2 cursor-pointer"
-                            >
-                                <span className="shrink-0">Copiar último mensaje</span>
-                            </button>
-                            <div className="border-t border-slate-800/50 my-1"></div>
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    onDelete?.();
-                                    setIsMenuOpen(false);
-                                }}
-                                className="w-full text-left px-4 py-2.5 text-xs text-red-400 hover:bg-red-500/10 transition-colors flex items-center space-x-2 font-medium cursor-pointer"
-                            >
-                                <span className="shrink-0">Eliminar</span>
-                            </button>
-                        </div>
-                    )}
-                </div>
+                <DropdownMenu
+                    animation="from-right"
+                    textSize="text-xs"
+                    trigger={
+                        <button
+                            className="opacity-0 cursor-pointer border border-white/10 group-hover:opacity-100 p-1.5 hover:bg-slate-700/50 text-slate-500 hover:text-slate-200 rounded-lg transition-all duration-300 backdrop-blur-sm"
+                        >
+                            <Ellipsis size={16} />
+                        </button>
+                    }
+                    items={[
+                        {
+                            label: "Exportar como JSON",
+                            icon: <Download size={18} />,
+                            onClick: () => onExportJson?.()
+                        },
+                        {
+                            label: "Galería",
+                            icon: <Image size={18} />,
+                            onClick: () => onGallery?.()
+                        },
+                        {
+                            label: "Copiar último mensaje",
+                            icon: <Copy size={18} />,
+                            onClick: () => onCopyLastMessage?.()
+                        },
+                        {
+                            label: "Eliminar",
+                            icon: <Trash2 size={18} />,
+                            variant: "danger",
+                            onClick: () => onDelete?.()
+                        }
+                    ]}
+                />
             )}
         </section>
     );
@@ -135,21 +110,19 @@ export const Sidebar = ({ isOpen, setOpen, onLogout, user, children }: SidebarPr
 
     const { conversations, currentConversationId, loadConversation, createNewChat, deleteConversation, isConversationsLoading } = useChat();
 
-    const { ref: dropdownRef, isDropdownOpen, setIsDropdownOpen } = useDropDown();
+    // No longer needed at this level
 
     const handleUserInfoClick = () => {
-        setIsDropdownOpen(false);
         // Aquí puedes agregar la lógica para mostrar información del usuario
         console.log('Mostrar información del usuario');
     };
 
     const handleLogoutClick = () => {
-        setIsDropdownOpen(false);
         onLogout();
     };
 
     const goEccomerceManager = () => {
-        setIsDropdownOpen(false);
+        // Navegación automática mediante Link
     };
 
     return (
@@ -266,66 +239,52 @@ export const Sidebar = ({ isOpen, setOpen, onLogout, user, children }: SidebarPr
                 </div>
             </nav>
 
-            <div className="mt-auto px-2 py-4 border-t border-slate-900 relative" ref={dropdownRef}>
-                <div className="flex items-center space-x-3">
-                    {/* imagen del usuario */}
-                    <div
-                        onClick={() => !isOpen ? setIsDropdownOpen(!isDropdownOpen) : null}
-
-                        className="size-10 rounded-full bg-slate-800 border border-slate-700">
-                        {user?.image ? (
-                            <img src={user.image} alt="User" className="size-full rounded-full" />
-                        ) : (
-                            <div className="size-full rounded-full flex items-center justify-center text-slate-400">
-                                {user?.username?.charAt(0).toUpperCase()}
+            <div className="mt-auto px-2 py-4 border-t border-slate-900 relative">
+                <DropdownMenu
+                    width="w-56"
+                    position="top"
+                    animation="from-bottom"
+                    trigger={
+                        <div className="flex items-center space-x-3 cursor-pointer">
+                            <div className="size-10 rounded-full bg-slate-800 border border-slate-700 overflow-hidden">
+                                {user?.image ? (
+                                    <img src={user.image} alt="User" className="size-full object-cover" />
+                                ) : (
+                                    <div className="size-full flex items-center justify-center text-slate-400">
+                                        {user?.username?.charAt(0).toUpperCase()}
+                                    </div>
+                                )}
                             </div>
-                        )}
-                    </div>
-                    {isOpen && (
-                        <>
-                            <div className="flex-1 space-y-1 gap-4 overflow-hidden">
-                                <p className="text-sm font-semibold text-slate-300 truncate">{user?.username}</p>
-                                {
-                                    user?.securityPhrase ? (
-                                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                                            Verificado
-                                        </div>
-                                    ) : null
-                                }
-                            </div>
-                            <div>
-                                <button
-                                    className='p-2 rounded-xl hover:bg-slate-800/50 cursor-pointer transition-colors'
-                                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                    aria-label="Opciones de usuario"
-                                >
-                                    <Ellipsis className="w-5 h-5 text-slate-400"></Ellipsis>
-                                </button>
-                            </div>
-                        </>
-                    )}
-                </div>
-
-                {isDropdownOpen && (
-                    <div className="absolute bottom-full left-2 right-2 mb-2 bg-slate-900 border border-slate-800 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-200 min-w-52">
-                        <Link href="/dashboard/info-user"
-                            onClick={handleUserInfoClick}
-                            className="w-full flex items-center space-x-3 px-4 py-3 text-sm text-slate-300 hover:bg-slate-800/50 transition-colors cursor-pointer"
-                        >
-                            <User size={20} />
-                            <span>Información de Usuario</span>
-                        </Link>
-                        <div className="border-t border-slate-800"></div>
-                        <button
-                            onClick={handleLogoutClick}
-                            className="w-full flex items-center space-x-3 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
-                        >
-                            <LogOut size={20} />
-                            <span>Cerrar Sesión</span>
-                        </button>
-                    </div>
-                )}
+                            {isOpen && (
+                                <>
+                                    <div className="flex-1 space-y-0.5 overflow-hidden">
+                                        <p className="text-sm font-semibold text-slate-300 truncate">{user?.username}</p>
+                                        {user?.securityPhrase && (
+                                            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase">
+                                                <div className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+                                                Verificado
+                                            </div>
+                                        )}
+                                    </div>
+                                    <Ellipsis className="w-5 h-5 text-slate-400 shrink-0" />
+                                </>
+                            )}
+                        </div>
+                    }
+                    items={[
+                        {
+                            label: "Información de Usuario",
+                            icon: <User size={20} />,
+                            onClick: () => handleUserInfoClick()
+                        },
+                        {
+                            label: "Cerrar Sesión",
+                            icon: <LogOut size={20} />,
+                            variant: "danger",
+                            onClick: () => handleLogoutClick()
+                        }
+                    ]}
+                />
             </div>
 
             <ConfirmationModal

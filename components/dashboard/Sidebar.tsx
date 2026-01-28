@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { useState } from 'react';
 import { Ellipsis, LogOut, User, MessageSquare, Plus, PanelLeftClose, Store } from 'lucide-react';
 import { User as UserType } from '@/types';
 import { useChat } from '@/components/context/contextInfoChat';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { GalleryModal } from '@/components/dashboard/GalleryModal';
 import { useDropDown } from '@/components/hooks/dropDown';
+import { useRouter } from 'next/navigation';
 
 interface SidebarItemProps {
     id: string;
@@ -35,12 +36,17 @@ export const SidebarItem = ({
     onCopyLastMessage,
     onGallery
 }: SidebarItemProps) => {
+    const router = useRouter()
     const { ref: menuRef, isDropdownOpen: isMenuOpen, setIsDropdownOpen: setIsMenuOpen } = useDropDown();
 
+    const handleLinkClick = () => {
+        onClick?.()
+        router.push(`/dashboard`)
+    }
+
     return (
-        <Link
-            href={`/dashboard`}
-            onClick={onClick}
+        <section
+            onClick={handleLinkClick}
             className={`outline-transparent border  group flex items-center space-x-3 ${!isOpen ? "px-2 py-1.5 justify-center" : "px-4 py-3"} rounded-lg transition-all duration-200 relative ${active
                 ? 'bg-blue-600/20 text-blue-400 border-blue-500/30'
                 : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border-transparent'
@@ -110,7 +116,7 @@ export const SidebarItem = ({
                     )}
                 </div>
             )}
-        </Link>
+        </section>
     );
 };
 

@@ -1,0 +1,606 @@
+"use client"
+import { useChat } from "@/components/context/contextInfoChat";
+import ChatBottomInputArea from "@/components/dashboard/ChatBottomInputArea";
+import { ChatSendButton } from "@/components/dashboard/ChatSendButton";
+import { useDropDown } from "@/components/hooks/dropDown";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
+import { Message } from "@/types";
+import { Search, DollarSign, Sparkles, Paperclip, Send, X, Check, Plus, Images } from "lucide-react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
+
+export default function Page() {
+
+    type tvista = "" | "agregar" | "buscar"
+    const [vistaTienda, setVistaTienda] = useState<tvista>("buscar")
+    const [numeroProductos, setNumeroProductos] = useState(0)
+
+    const handleAgregar = () => {
+        setVistaTienda("agregar")
+    }
+    const handleBuscar = () => {
+        setVistaTienda("buscar")
+    }
+
+    return (
+        <div className="p-6 flex flex-col gap-6 overflow-auto">
+            <header className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+
+                <Card
+                    title="Agregar productos"
+                    description="Crea una vista del nuevo producto en unos pasos simples"
+                    className="p-2 flex flex-col items-center justify-center">
+                    <button
+                        onClick={handleAgregar}
+                        className="transition duration-200 shadow-lg bg-blue-600 hover:bg-blue-500 shadow-blue-500/20 hover:shadow-blue-500/40 text-white px-4 py-2 rounded-lg active:scale-95">
+                        Agregar
+                    </button>
+                </Card>
+                <Card
+                    title="Numero de productos"
+                    description="Es una manera de ver cuantos productos tienes en la tienda"
+                    className="p-2">
+                    <p className="text-3xl text-center font-bold text-slate-200">
+                        {numeroProductos}
+                    </p>
+                </Card>
+                <Card
+                    title="Buscar productos"
+                    description="Busca un producto facilmente por su nombre o referencia"
+                    className="p-2 flex flex-col items-center justify-center">
+
+                    <button
+                        onClick={handleBuscar}
+                        className="transition duration-200 shadow-lg bg-blue-600 hover:bg-blue-500 shadow-blue-500/20 hover:shadow-blue-500/40 text-white px-4 py-2 rounded-lg active:scale-95">
+                        Buscar
+                    </button>
+
+                </Card>
+            </header>
+
+            {vistaTienda === "agregar" && <AgregarProducto />}
+            {vistaTienda === "buscar" && <BuscarProducto />}
+
+        </div>
+    )
+}
+
+function AgregarProducto() {
+    return (
+        <div className="flex flex-col gap-8 max-w-5xl mx-auto">
+            <Card
+                title="Danos las caracteristicas del producto"
+                description="Agregar un nuevo producto es tan sencillo como llenar un formulario"
+                className="p-2">
+                <form
+                    className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                    action="">
+                    {/* info */}
+                    <section className="flex flex-col gap-4">
+                        <Input label="Nombre" type="text" name="nombre" id="nombre" placeholder="Nombre del producto" />
+                        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <Input label="Precio" type="number" name="precio" id="precio" placeholder="Precio del producto" />
+
+                            <Input label="Categoria" type="text" name="categoria" id="categoria" placeholder="Categoria del producto" />
+                        </section>
+                        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <Select
+                                label="Talla"
+                                name="talla"
+                                id="talla"
+                                options={[
+                                    { value: "S", label: "S" },
+                                    { value: "M", label: "M" },
+                                    { value: "L", label: "L" },
+                                    { value: "XL", label: "XL" },
+                                    { value: "XXL", label: "XXL" }
+                                ]}
+                            />
+                            <Select
+                                label="Color"
+                                name="color"
+                                id="color"
+                                options={[
+                                    { value: "Rojo", label: "Rojo" },
+                                    { value: "Verde", label: "Verde" },
+                                    { value: "Azul", label: "Azul" },
+                                    { value: "Amarillo", label: "Amarillo" }
+                                ]}
+                            />
+                        </section>
+                        <Select
+                            label="Genero"
+                            name="genero"
+                            id="genero"
+                            options={[
+                                { value: "Masculino", label: "Masculino" },
+                                { value: "Femenino", label: "Femenino" },
+                                { value: "Unisex", label: "Unisex" }
+                            ]}
+                        />
+                        <Input label="Descripcion" type="text" name="descripcion" id="descripcion" placeholder="Descripcion del producto" />
+                    </section>
+                    {/* imagen */}
+                    <section className="flex flex-col">
+                        <label htmlFor="imagen" className="text-xs md:text-sm font-medium text-slate-300 ml-1 mb-2 block">Imagen</label>
+                        <input type="file" name="imagen" id="imagen" className="size-full flex-1 p-6 relative overflow-hidden group w-full bg-slate-950/50 border border-slate-800 rounded-2xl transition-all duration-300 hover:border-slate-700 focus-within:border-blue-500/50 focus-within:ring-4 focus-within:ring-blue-500/10 text-slate-400" />
+                    </section>
+                    <Button className="col-span-1 md:col-span-2" type="submit">Agregar</Button>
+                </form>
+
+            </Card>
+
+            <AIInputSection />
+        </div>
+    )
+}
+
+interface ImageFile {
+    file: File;
+    preview: string;
+}
+
+function AIInputSection() {
+    // contexto
+    const { isLoading, message, setIsLoading, setMessages, setMessage, currentConversationId, setCurrentConversationId, refreshConversations } = useChat()
+    // estados
+    const [selectedImages, setSelectedImages] = useState<ImageFile[]>([])
+    const [isVisionEnabled, setIsVisionEnabled] = useState(false)
+    const [showToast, setShowToast] = useState(false)
+    // referencias
+    const refTextArea = useRef<HTMLTextAreaElement>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
+    const abortControllerRef = useRef<AbortController | null>(null)
+
+    const { ref: menuRef, isDropdownOpen: isMobileMenuOpen, setIsDropdownOpen: setIsMobileMenuOpen } = useDropDown()
+
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+
+        Promise.all(
+            files.map(
+                file =>
+                    new Promise<{ file: File; preview: string }>((resolve, reject) => {
+                        // Validaciones opcionales
+                        if (!file.type.startsWith("image/")) {
+                            reject(new Error("Archivo no es imagen"));
+                            return;
+                        }
+
+                        const reader = new FileReader();
+                        reader.onload = () =>
+                            resolve({
+                                file,
+                                preview: reader.result as string
+                            });
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    })
+            )
+        )
+            .then(images => {
+                setSelectedImages(prev => [...prev, ...images]);
+            })
+            .catch(console.error);
+
+        if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+
+    const removeImage = (index: number) => {
+        setSelectedImages(prev => {
+            const newImages = [...prev]
+            URL.revokeObjectURL(newImages[index].preview)
+            newImages.splice(index, 1)
+            return newImages
+        })
+    }
+
+    const sendMessage = (message: Message) => {
+        setIsLoading(true)
+        const controller = new AbortController()
+        abortControllerRef.current = controller
+        const messageContent = {
+            role: "system",
+            content: `
+Responde en Markdown bien estructurado:
+- Usa títulos  con (#) decendentes
+- Usa listas
+- Usa bloques de código cuando sea necesario
+- No expliques el Markdown, solo úsalo
+- Usa tablas cuando sea necesario
+- Usa citas cuando sea necesario
+- No uses enlaces
+- Responde siempre en español
+`
+        }
+        fetch('/api/dashboard/chat', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messages: [messageContent, message], visionEnabled: isVisionEnabled, conversationId: currentConversationId }),
+            signal: controller.signal
+        }).then((res) => {
+            if (!res.ok) throw new Error('Error al enviar el mensaje')
+
+            const newConvId = res.headers.get("X-Conversation-Id");
+            if (newConvId && newConvId !== currentConversationId) {
+                setCurrentConversationId(newConvId);
+                // Trigger refresh in background to show new item in sidebar
+                refreshConversations();
+            }
+
+            return res.text()
+        }).then((data) => {
+            setMessages((prevMessages: Message[]) => [...prevMessages, { role: 'assistant', content: [{ type: 'text', text: data }] }])
+            // Solo limpiamos si el mensaje se envió con éxito
+            setMessage(null)
+            setSelectedImages([])
+        }).catch((error) => {
+            if (error.name === 'AbortError') {
+                console.log('Petición cancelada por el usuario')
+                // Removemos el mensaje optimista si se canceló
+                setMessages((prevMessages: Message[]) => prevMessages.slice(0, -1))
+            } else {
+                console.error(error)
+            }
+        }).finally(() => {
+            setIsLoading(false)
+            abortControllerRef.current = null
+        })
+    }
+
+    const handleSend = () => {
+        if (isLoading) {
+            abortControllerRef.current?.abort()
+            return
+        }
+
+        const messageVal = refTextArea.current?.value
+        if (!messageVal && selectedImages.length === 0) return
+
+        let preview: { type: "input_image", image_url: string }[] | null = null
+        if (isVisionEnabled)
+            preview = selectedImages.map(({ preview }) => ({ type: "input_image", image_url: preview }))
+
+        const newMessage: Message = {
+            role: 'user',
+            content: [
+                { type: isVisionEnabled ? 'input_text' : 'text', text: messageVal || "" },
+                ...(isVisionEnabled && preview ? preview : [])
+            ]
+        }
+
+        setMessage(newMessage)
+        setMessages((prevMessages: Message[]) => [...prevMessages, newMessage])
+        sendMessage(newMessage)
+    }
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSend();
+        }
+    }
+
+    const handleClickNoActive = () => {
+        if (!isVisionEnabled) {
+            setShowToast(true);
+            return;
+        }
+        fileInputRef.current?.click()
+    }
+
+    return (
+        <>
+            {/* Main Container */}
+            <div className={`
+                            ${isLoading ? 'border-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.15)] ring-1 ring-blue-500/20' : 'border-white/10 shadow-xl'} 
+                            relative flex flex-col bg-slate-900/95 border backdrop-blur-3xl rounded-4xl overflow-visible focus-within:border-blue-500/40 focus-within:shadow-[0_0_25px_rgba(59,130,246,0.1)] transition-all duration-500
+                        `}>
+                {/* Animated Loading Bar (Only visible when loading) */}
+                {isLoading && (
+                    <div className="absolute overflow-hidden px-4 md:px-6 top-0 left-0 right-0 size-full rounded-4xl">
+                        <div className="absolute px-4 md:px-6 top-0 left-0 right-0 h-[2px] bg-linear-to-r from-transparent via-blue-500 to-transparent animate-shimmer z-10"></div>
+                    </div>
+                )}
+
+                {/* Preview images Area (Inside) */}
+                {(isVisionEnabled && selectedImages.length > 0) && (
+                    <div className="flex flex-wrap gap-3 p-4 pb-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                        {selectedImages.map((img, index) => (
+                            <div key={index} className="relative group/img w-20 h-20 rounded-2xl overflow-hidden border border-white/10 bg-slate-800/50 shadow-inner">
+                                <img
+                                    src={img.preview}
+                                    alt="preview"
+                                    className="w-full h-full object-cover"
+                                />
+                                <button
+                                    onClick={() => removeImage(index)}
+                                    className="absolute top-1.5 right-1.5 bg-slate-900/80 hover:bg-slate-950 text-white rounded-full p-1 border border-white/20 transition-all hover:scale-110 shadow-lg"
+                                >
+                                    <X size={14} />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Box Layout Container */}
+                <div className="flex flex-col">
+                    {/* Textarea Area */}
+                    <div className="px-4 pt-2">
+                        <textarea
+                            ref={refTextArea}
+                            disabled={isLoading}
+                            value={message?.content[0] && 'text' in message.content[0] ? message.content[0].text : ''}
+                            onChange={(e) => setMessage({ role: 'user', content: [{ type: isVisionEnabled ? 'input_text' : 'text', text: e.target.value }] })}
+                            onKeyDown={handleKeyDown}
+                            placeholder={isLoading ? "La IA está procesando..." : "Escribe un mensaje..."}
+                            wrap="soft"
+                            className={`
+                                            w-full bg-transparent border-none focus:ring-0 text-slate-100 placeholder-slate-500/80 py-4 px-2 resize-none min-w-0 whitespace-pre-wrap wrap-break-word custom-scrollbar outline-none text-sm md:text-base field-sizing-content h-auto max-h-60 overflow-y-auto transition-opacity duration-300
+                                            ${isLoading ? 'opacity-50 select-none' : 'opacity-100'}
+                                        `}
+                        />
+                    </div>
+
+                    {/* Actions Row Mobile */}
+                    <div className="md:hidden flex items-center justify-between px-5 pb-4 relative">
+                        {/* Menu Dropdown & Toggle */}
+                        <div className="flex items-center gap-2" ref={menuRef}>
+                            <div className="relative">
+                                {/* Dropdown Menu */}
+                                <div className={`
+                                                absolute bottom-full left-0 mb-3 flex flex-col gap-2 transition-all duration-300 origin-bottom-left z-20
+                                                ${isMobileMenuOpen
+                                        ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
+                                        : 'opacity-0 translate-y-4 scale-95 pointer-events-none'
+                                    }
+                                            `}>
+                                    <div className="p-2 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl flex flex-col gap-2 min-w-[140px]">
+                                        {/* Vision Toggle */}
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const newValue = !isVisionEnabled;
+                                                setIsVisionEnabled(newValue);
+                                                if (!newValue) setSelectedImages([]);
+                                            }}
+                                            className={`
+                                                            w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
+                                                            ${isVisionEnabled
+                                                    ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30'
+                                                    : 'hover:bg-white/5 text-slate-400 border border-transparent'
+                                                }
+                                                        `}
+                                        >
+                                            <div className={`
+                                                            flex items-center justify-center w-5 h-5 rounded-md transition-all duration-300
+                                                            ${isVisionEnabled ? 'bg-blue-500 text-white rotate-0 scale-100' : 'bg-slate-700/50 text-slate-500'}
+                                                        `}>
+                                                {isVisionEnabled ? <Check size={14} strokeWidth={3} /> : <div className="w-1.5 h-1.5 rounded-full bg-slate-500" />}
+                                            </div>
+                                            <span className="text-xs font-semibold tracking-wide">Visión</span>
+                                        </button>
+
+                                        {/* Upload Image */}
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                handleClickNoActive();
+                                            }}
+                                            className={`
+                                                            w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
+                                                            ${isVisionEnabled
+                                                    ? 'text-slate-200 hover:bg-white/5'
+                                                    : 'text-slate-500 hover:text-slate-400 cursor-not-allowed opacity-60'
+                                                }
+                                                        `}
+                                        >
+                                            <Paperclip size={18} />
+                                            <span className="text-xs font-medium">Adjuntar</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Toggle Button */}
+                                <button
+                                    type="button"
+                                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                    className={`
+                                                    flex items-center justify-center p-3 rounded-2xl transition-all duration-300 border
+                                                    ${isMobileMenuOpen
+                                            ? 'bg-blue-600/20 border-blue-500/50 text-blue-400 rotate-90'
+                                            : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                                        }
+                                                `}
+                                >
+                                    <Plus size={20} className={`transition-transform duration-300 ${isMobileMenuOpen ? 'rotate-45' : 'rotate-0'}`} />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Send Button Mobile */}
+                        <ChatSendButton
+                            onClick={handleSend}
+                            isLoading={isLoading}
+                            isDisabled={(!refTextArea.current?.value && selectedImages.length === 0) && !isLoading}
+                        />
+                    </div>
+
+                    {/* Actions Row Desktop*/}
+                    <div className="hidden md:flex items-center justify-between px-5 pb-4">
+                        <div className="flex items-center space-x-3">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const newValue = !isVisionEnabled;
+                                    setIsVisionEnabled(newValue);
+                                    if (!newValue) {
+                                        setSelectedImages([]);
+                                    }
+                                }}
+                                disabled={isLoading}
+                                className={`
+                                                    group relative flex items-center gap-2.5 px-3.5 py-2 rounded-2xl transition-all duration-300 border active:scale-95 scale-100 active:shadow-lg
+                                                    ${isVisionEnabled
+                                        ? 'bg-blue-600/15 border-blue-500/40 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.15)] ring-1 ring-blue-500/20'
+                                        : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:border-white/20'
+                                    }
+                                                `}
+                            >
+                                <div className={`
+                                                    flex items-center justify-center w-5 h-5 rounded-md transition-all duration-300
+                                                    ${isVisionEnabled ? 'bg-blue-500 text-white rotate-0 scale-100 shadow-sm' : 'bg-slate-700/50 text-slate-500 -rotate-90 scale-90'}
+                                                `}>
+                                    {isVisionEnabled ? <Check size={14} strokeWidth={3} /> : <div className="w-1.5 h-1.5 rounded-full bg-slate-500" />}
+                                </div>
+                                <span className="text-xs font-bold tracking-wider uppercase">Visión</span>
+                                <Images size={19} className={`transition-transform duration-300 ${isVisionEnabled ? 'scale-110' : 'scale-100 opacity-70'}`} />
+
+                                {/* Indicator Glow */}
+                                {isVisionEnabled && (
+                                    <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500 border border-slate-900"></span>
+                                    </span>
+                                )}
+                            </button>
+                            {/* Button to upload images */}
+                            <button
+                                type="button"
+                                onClick={handleClickNoActive}
+                                disabled={isLoading}
+                                className={`
+                                                group/img flex cursor-pointer items-center gap-2 px-3 py-2 rounded-2xl transition-all duration-300 border active:scale-95 scale-100 active:shadow-lg
+                                                ${isVisionEnabled
+                                        ? 'text-blue-400/90 hover:text-blue-300 hover:bg-blue-500/10 border-blue-500/20 hover:border-blue-500/40 bg-blue-500/5'
+                                        : 'text-slate-600 border-white/5 bg-white/2 opacity-80 hover:bg-white/4'
+                                    }
+                                            `}
+                                title={isVisionEnabled ? "Adjuntar imágenes" : "Habilita Visión para adjuntar imágenes"}
+                            >
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    onChange={handleFileChange}
+                                    multiple
+                                    accept="image/*"
+                                    className="hidden"
+                                />
+                                <Paperclip size={20} className={`transition-transform duration-300 ${isVisionEnabled ? 'group-hover/img:rotate-12 group-hover/img:scale-110' : ''}`} />
+
+                            </button>
+                        </div>
+
+                        <div className="flex items-center">
+                            <ChatSendButton
+                                onClick={handleSend}
+                                isLoading={isLoading}
+                                isDisabled={(!refTextArea.current?.value && selectedImages.length === 0) && !isLoading}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Legal Notice */}
+            <p className=" text-xs md:text-sm text-slate-400 text-center mt-3 font-medium opacity-60">
+                MoIA puede cometer errores. Considera verificar la información importante.
+            </p>
+        </>
+    )
+}
+
+function BuscarProducto() {
+    return (
+        <Card
+            title="Buscar Producto"
+            description="Filtra los productos por nombre, categoría o género."
+            className="p-2"
+        >
+            <form className="grid grid-cols-1 gap-6">
+
+                {/* Search Section */}
+                <section>
+                    <Input
+                        label="Nombre del producto"
+                        type="text"
+                        name="nombre"
+                        id="search-nombre"
+                        placeholder="Ej: Camiseta Oversize..."
+                        rightElement={<Search className="w-4 h-4 text-slate-500" />}
+                    />
+                </section>
+
+                <div className="border-t border-slate-800/50 my-2"></div>
+
+                {/* Filters Section */}
+                <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Input
+                        label="Categoria"
+                        type="text"
+                        name="categoria"
+                        id="search-categoria"
+                        placeholder="Ej: Ropa, Accesorios..."
+                    />
+                    <Select
+                        label="Genero"
+                        name="genero"
+                        id="search-genero"
+                        placeholder="Todos"
+                        options={[
+                            { value: "todos", label: "Todos" },
+                            { value: "Masculino", label: "Masculino" },
+                            { value: "Femenino", label: "Femenino" },
+                            { value: "Unisex", label: "Unisex" }
+                        ]}
+                    />
+                </section>
+
+                {/* Price and Sort Section */}
+                <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Input
+                        label="Precio Mínimo"
+                        type="number"
+                        name="min_price"
+                        id="search-min-price"
+                        placeholder="0.00"
+                        rightElement={<DollarSign className="w-4 h-4 text-slate-500" />}
+                    />
+                    <Input
+                        label="Precio Máximo"
+                        type="number"
+                        name="max_price"
+                        id="search-max-price"
+                        placeholder="1000.00"
+                        rightElement={<DollarSign className="w-4 h-4 text-slate-500" />}
+
+                    />
+                    <Select
+                        label="Ordenar por"
+                        name="sort"
+                        id="search-sort"
+                        placeholder="Relevancia"
+                        options={[
+                            { value: "relevance", label: "Relevancia" },
+                            { value: "price_asc", label: "Precio: Menor a Mayor" },
+                            { value: "price_desc", label: "Precio: Mayor a Menor" },
+                            { value: "newest", label: "Más recientes" }
+                        ]}
+                    />
+                </section>
+
+                <Button className="w-full md:w-auto md:ml-auto px-8" type="submit">
+                    Buscar Productos
+                </Button>
+            </form>
+
+            <div className="mt-6 pt-6 border-t border-slate-800/50">
+                <ChatBottomInputArea />
+            </div>
+        </Card>
+    )
+}

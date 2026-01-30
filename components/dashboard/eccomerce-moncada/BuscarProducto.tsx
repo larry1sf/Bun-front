@@ -37,6 +37,11 @@ export default function BuscarProducto({ setStateToast }: {
     const { opciones } = useTienda()
     const { showFilters, isFiltersFullyOpen, setShowFilters } = useFiltroDropdown()
 
+    const { numeroProductos, getNumeroProductos } = useTienda()
+    useEffect(() => {
+        if (numeroProductos <= 0) getNumeroProductos()
+    }, [])
+
     // eliminar
 
     const [isOpenModalEliminar, setIsOpenModalEliminar] = useState(false)

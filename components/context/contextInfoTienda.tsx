@@ -33,10 +33,6 @@ export const TiendaProvider = ({ children }: { children: React.ReactNode }) => {
         }
     })
 
-    useEffect(() => {
-        if (numeroProductos <= 0) getNumeroProductos()
-    }, [])
-
     // buscar el numero de productos publicados
     const getNumeroProductos = useCallback(() => {
         fetch("/api/numero-productos")

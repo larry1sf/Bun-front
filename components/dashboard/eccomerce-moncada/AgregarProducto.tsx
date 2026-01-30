@@ -2,8 +2,8 @@ import { Card } from "@/components/ui/Card"
 import { Input } from "@/components/ui/Input"
 import { Select } from "@/components/ui/Select"
 import AIInputSection from "@/components/dashboard/AIInputSection"
-import { useState, useEffect, useRef } from "react"
-import { Package, Tag, DollarSign, Palette, Ruler, AlignLeft, VenusAndMars, ShoppingBag, MessageSquare, ChevronDown } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Package, Tag, DollarSign, Palette, Ruler, AlignLeft, VenusAndMars, ShoppingBag, MessageSquare, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react"
 import { Message } from "@/types"
 import { ChatBubbleUser, ChatBubbleAI, ChatBubbleLoading } from "@/components/dashboard/ChatBubble"
 
@@ -39,7 +39,16 @@ export default
     //     })
     // }
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<{
+        nombre: string;
+        precio: number;
+        categoria: string;
+        talla: never[];
+        color: never[];
+        genero: string;
+        descripcion: string;
+        imageUrl: string[];
+    }>({
         nombre: '',
         precio: 0,
         categoria: '',
@@ -47,8 +56,12 @@ export default
         color: [],
         genero: '',
         descripcion: '',
-        imageUrl: ''
+        imageUrl: []
     });
+
+    useEffect(() => {
+        console.log(formData);
+    }, [formData])
 
     const [messages, setMessages] = useState<Message[]>([]);
 
@@ -69,6 +82,23 @@ export default
             };
             const updated = typeof updateFn === 'function' ? updateFn(mockPrev) : updateFn;
 
+            // Funcionalidad para acumular imágenes sin duplicados
+            let newImageUrls = prev.imageUrl;
+            if (updated.imageUrl && Array.isArray(updated.imageUrl)) {
+                const newImages = updated.imageUrl;
+                const existingSet = new Set(prev.imageUrl.filter(url => url && url.length > 0));
+
+                // Agregar solo las imágenes nuevas que no existan
+                newImages.forEach((img: string) => {
+                    if (img && img.length > 0 && !existingSet.has(img)) {
+                        newImageUrls = [...newImageUrls, img];
+                    }
+                });
+
+                // Filtrar strings vacíos del inicio
+                newImageUrls = newImageUrls.filter(url => url && url.length > 0);
+            }
+
             return {
                 ...prev,
                 nombre: updated.name || updated.nombre || prev.nombre,
@@ -77,7 +107,8 @@ export default
                 descripcion: updated.description || updated.descripcion || prev.descripcion,
                 precio: updated.precio || updated.price || prev.precio,
                 color: updated.color || prev.color,
-                talla: updated.talla || updated.size || prev.talla
+                talla: updated.talla || updated.size || prev.talla,
+                imageUrl: newImageUrls,
             };
         });
     }
@@ -153,21 +184,22 @@ export default
     )
 }
 
-function ProductPreview({ data }: { data: any }) {
+function ProductPreview({ data }: {
+    data: {
+        nombre: string;
+        precio: number;
+        categoria: string;
+        talla: never[];
+        color: never[];
+        genero: string;
+        descripcion: string;
+        imageUrl: string[];
+    }
+}) {
     return (
         <div className="flex flex-col gap-4 p-5 rounded-3xl bg-slate-950/40 border border-slate-800/50 shadow-2xl backdrop-blur-xl group transition-all duration-300 hover:border-blue-500/30">
             <div className="flex gap-4 items-start">
-                <div className="size-28 rounded-2xl bg-slate-900/80 border border-slate-800/50 overflow-hidden flex items-center justify-center relative group-hover:scale-[1.02] transition-transform duration-300">
-                    {data.imageUrl ? (
-                        <img src={data.imageUrl} className="size-full object-cover" alt="Preview" />
-                    ) : (
-                        <div className="flex flex-col items-center gap-2 text-slate-600">
-                            <Package className="size-10" />
-                            <span className="text-[10px] uppercase font-bold tracking-tighter">Sin Imagen</span>
-                        </div>
-                    )}
-                    <div className="absolute inset-0 bg-linear-to-t from-slate-950/20 to-transparent pointer-events-none" />
-                </div>
+                <ImageGallery imageUrls={data.imageUrl} />
                 <div className="flex-1 flex flex-col gap-2 min-w-0">
                     <h3 className="text-lg font-bold text-slate-100 truncate group-hover:text-blue-400 transition-colors">
                         {data.nombre || 'Nombre del Producto'}
@@ -250,11 +282,7 @@ function ProductPreview({ data }: { data: any }) {
 }
 
 function ChatHistory({ messages, isLoading }: { messages: Message[], isLoading: boolean }) {
-    const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-    useEffect(() => {
-        // messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-    }, [messages, isLoading]);
 
     if (messages.length === 0 && !isLoading) {
         return (
@@ -281,7 +309,7 @@ function ChatHistory({ messages, isLoading }: { messages: Message[], isLoading: 
                                 return <ChatBubbleUser key={key} message={item.text} />
                             }
                             if (item.type === 'input_image' && item.image_url) {
-                                return <ChatBubbleUser key={key} image_url={item.image_url} />
+                                return <ChatBubbleUser className="w-50! aspect-square" key={key} image_url={item.image_url} />
                             }
                         }
                         if (role === 'assistant') {
@@ -294,7 +322,6 @@ function ChatHistory({ messages, isLoading }: { messages: Message[], isLoading: 
                 </div>
             ))}
             {isLoading && <ChatBubbleLoading />}
-            <div ref={messagesEndRef} />
         </div>
     )
 }
@@ -410,4 +437,94 @@ function FormClasico({
             </section>
         </>
     )
+}
+
+function ImageGallery({ imageUrls }: { imageUrls: string[] }) {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [isTransitioning, setIsTransitioning] = useState(false);
+
+    const validImages = imageUrls.filter((url) => url && url.length > 0);
+    const hasImages = validImages.length > 0;
+
+    const handlePrevious = () => {
+        if (!isTransitioning) {
+            setIsTransitioning(true);
+            setCurrentIndex((prev) => (prev === 0 ? validImages.length - 1 : prev - 1));
+            setTimeout(() => setIsTransitioning(false), 500);
+        }
+    };
+
+    const handleNext = () => {
+        if (!isTransitioning) {
+            setIsTransitioning(true);
+            setCurrentIndex((prev) => (prev === validImages.length - 1 ? 0 : prev + 1));
+            setTimeout(() => setIsTransitioning(false), 500);
+        }
+    };
+
+    // {/* Galería Principal */}
+    return (
+        <div className="size-28 rounded-2xl bg-slate-900/80 border border-slate-800/50 overflow-hidden flex items-center justify-center relative group-hover:scale-[1.02] transition-transform duration-300 mb-3">
+            {hasImages ? (
+                <>
+                    <div className="size-full relative">
+                        {validImages.map((image, index) => (
+                            <img
+                                key={index}
+                                src={image}
+                                className={`absolute inset-0 size-full object-cover transition-all duration-500 ease-in-out ${index === currentIndex
+                                    ? 'opacity-100 translate-x-0'
+                                    : index < currentIndex
+                                        ? 'opacity-0 -translate-x-full'
+                                        : 'opacity-0 translate-x-full'
+                                    }`}
+                                alt={`Preview ${index}`}
+                            />
+                        ))}
+                    </div>
+
+                    {validImages.length > 1 && (
+                        <>
+                            <button
+                                onClick={handlePrevious}
+                                disabled={isTransitioning}
+                                className="absolute left-1 top-1/2 -translate-y-1/2 p-1 rounded-full bg-black/50 hover:bg-black/70 transition-colors disabled:opacity-50 z-10"
+                                aria-label="Previous image"
+                            >
+                                <ChevronLeft className="size-4 text-white" />
+                            </button>
+                            <button
+                                onClick={handleNext}
+                                disabled={isTransitioning}
+                                className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded-full bg-black/50 hover:bg-black/70 transition-colors disabled:opacity-50 z-10"
+                                aria-label="Next image"
+                            >
+                                <ChevronRight className="size-4 text-white" />
+                            </button>
+                            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+                                {validImages.map((_, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => !isTransitioning && setCurrentIndex(index)}
+                                        className={`w-1.5 h-1.5 rounded-full transition-all ${index === currentIndex
+                                            ? 'bg-blue-400 w-4'
+                                            : 'bg-white/40 hover:bg-white/60'
+                                            }`}
+                                        aria-label={`Go to image ${index + 1}`}
+                                    />
+                                ))}
+                            </div>
+                        </>
+                    )}
+                </>
+            ) : (
+                <div className="flex flex-col items-center gap-2 text-slate-600">
+                    <Package className="size-10" />
+                    <span className="text-[10px] uppercase font-bold tracking-tighter">Sin Imagen</span>
+                </div>
+            )}
+            <div className="absolute inset-0 bg-linear-to-t from-slate-950/20 to-transparent pointer-events-none" />
+        </div>
+
+    );
 }

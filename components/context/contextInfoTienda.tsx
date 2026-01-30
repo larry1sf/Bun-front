@@ -3,8 +3,12 @@
 import { optionsFilters } from "@/types";
 import { createContext, useCallback, useContext, useEffect, useState } from "react"
 
+type numeroProps = {
+    count: number | null
+    error: boolean
+}
 interface tiendaCreateContext {
-    numeroProductos: number
+    numeroStateProductos: numeroProps
     opciones: optionsFilters
     getNumeroProductos: () => void
     getFilters: () => void
@@ -13,7 +17,10 @@ interface tiendaCreateContext {
 const TiendaContext = createContext<tiendaCreateContext | undefined>(undefined)
 
 export const TiendaProvider = ({ children }: { children: React.ReactNode }) => {
-    const [numeroProductos, setNumeroProductos] = useState(0)
+    const [numeroStateProductos, setNumeroStateProductos] = useState<numeroProps>({
+        count: null,
+        error: false
+    })
     const [opciones, setOpciones] = useState<optionsFilters>(() => {
         if (typeof window !== "undefined") {
             const opciones = localStorage.getItem("opcionesFiltros")
@@ -33,16 +40,24 @@ export const TiendaProvider = ({ children }: { children: React.ReactNode }) => {
         }
     })
 
+    useEffect(() => {
+        if (numeroStateProductos.error) return
+        getNumeroProductos()
+    }, [])
+
     // buscar el numero de productos publicados
     const getNumeroProductos = useCallback(() => {
         fetch("/api/numero-productos")
-            .then(res => res.json() as Promise<{ numeroProductos: number }>)
+            .then(res => {
+                return res.json() as Promise<{ numeroProductos: number | null }>
+            })
             .then(({ numeroProductos }) => {
-                setNumeroProductos(numeroProductos)
+                setNumeroStateProductos({
+                    count: numeroProductos,
+                    error: typeof numeroProductos !== 'number'
+                })
             })
-            .catch(err => {
-                console.error("Error al obtener el numero de productos", err)
-            })
+
     }, [])
 
     // busca las opciones para los filtros 
@@ -72,7 +87,7 @@ export const TiendaProvider = ({ children }: { children: React.ReactNode }) => {
     return (
         <TiendaContext.Provider value={{
             opciones,
-            numeroProductos,
+            numeroStateProductos,
             getFilters,
             getNumeroProductos
         }}>

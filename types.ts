@@ -33,6 +33,7 @@ export interface tform {
     precio?: number,
     color?: string[],
     talla?: string[],
+    imageUrl?: string | string[]
     price_min: number,
     price_max: number,
     sort: "" | "price_asc" | "price_desc" | "newest"

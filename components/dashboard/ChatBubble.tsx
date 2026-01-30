@@ -71,7 +71,7 @@ export function ChatBubbleAI({ message }: { message: string }) {
     )
 }
 
-export function ChatBubbleUser({ message, image_url }: { message?: string, image_url?: string }) {
+export function ChatBubbleUser({ message, image_url, className }: { message?: string, image_url?: string, className?: string }) {
     const { user } = useUser()
     return (
         <div className="flex items-start flex-row-reverse space-x-4 space-x-reverse">
@@ -80,7 +80,7 @@ export function ChatBubbleUser({ message, image_url }: { message?: string, image
                 {
                     image_url ? (
                         <div>
-                            <Image src={image_url} alt="" width={500} height={500} className="w-full h-auto rounded-xl" />
+                            <Image src={image_url} alt="" width={500} height={500} className={`object-cover w-full h-auto rounded-xl ${className || ''}`} />
                             {message}
                         </div>
                     ) :

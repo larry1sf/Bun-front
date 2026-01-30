@@ -2,7 +2,7 @@
 
 import { Toast } from "@/app/components/Toast";
 import { Card } from "@/components/ui/Card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import BuscarProducto from "@/components/dashboard/eccomerce-moncada/BuscarProducto";
 import AgregarProducto from "@/components/dashboard/eccomerce-moncada/AgregarProducto";
@@ -12,7 +12,6 @@ import { useTienda } from "@/components/context/contextInfoTienda";
 export default function Page() {
     type tvista = "" | "agregar" | "buscar"
     const [vistaTienda, setVistaTienda] = useState<tvista>("buscar")
-    const { numeroProductos } = useTienda()
 
     const handleAgregar = () => {
         setVistaTienda("agregar")
@@ -21,6 +20,15 @@ export default function Page() {
         setVistaTienda("buscar")
 
     }
+
+    // numero de productos
+    const { numeroStateProductos } = useTienda()
+
+    useEffect(() => {
+        if (numeroStateProductos.error) {
+            setStateToast({ message: "Error al cargar el numero de productos", variant: "error" })
+        }
+    }, [numeroStateProductos])
 
     // toast
     const [stateToast, setStateToast] = useState({
@@ -60,7 +68,7 @@ export default function Page() {
                     description="Es una manera de ver cuantos productos tienes en la tienda"
                     className="p-2">
                     <p className="text-3xl text-center font-bold text-slate-200">
-                        {numeroProductos}
+                        {numeroStateProductos.count}
                     </p>
                 </Card>
                 <Card

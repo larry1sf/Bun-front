@@ -104,33 +104,24 @@ export default function AIInputSection({
             }),
             signal: controller.signal
         })
-            .then(async (res) => {
-                if (!res.ok) {
-                    const errorData = await res.json().catch(() => ({}));
-                    const errorMessage = errorData.message || errorData.error || 'El servidor de IA no responde correctamente';
-                    throw new Error(`${errorMessage} (Status: ${res.status})`);
-                }
-                return res.json();
-            })
+            .then(async (res) => res.json())
             .then(data => {
                 if (!data?.respuesta) throw new Error("La IA no devolvió una respuesta válida");
                 try {
                     const { data: dataIa, message } = JSON.parse(data?.respuesta)
                     const parsedData = Array.isArray(dataIa) ? dataIa[0] : dataIa
-                    const messageIa = message ?? ""
+                    const messageIa = message || "Lo siento no pude entender muy bien que hacer, por favor repiteme la orden."
 
                     const normalized: Partial<tform> = {}
 
                     // Mapeo inteligente de llaves
                     if (parsedData.name) normalized.name = parsedData.name || "";
-                    if (parsedData.categoria) normalized.categoria = parsedData.categoria || "";
-                    if (parsedData.genero) normalized.genero = parsedData.genero || "";
-                    if (parsedData.clothing_type) normalized.clothing_type = parsedData.clothing_type || "";
+                    if (parsedData.category) normalized.categoria = parsedData.category || "";
+                    if (parsedData.gender) normalized.genero = parsedData.gender || "";
                     if (parsedData.description) normalized.descripcion = parsedData.description || "";
                     if (parsedData.price) normalized.precio = parsedData.price || 0;
                     if (parsedData.color) normalized.color = parsedData.color || [];
                     if (parsedData.size) normalized.talla = parsedData.size || [];
-
                     return { normalized, messageIa };
                 } catch (e) {
                     throw new Error("Formato de sugerencia inválido");
@@ -168,6 +159,7 @@ export default function AIInputSection({
                 // Limpiamos siempre al finalizar el proceso
                 setMessage(null);
                 setSelectedImages([]);
+                // NO limpiamos las imágenes para que se acumulen
             });
     }
 
@@ -181,8 +173,11 @@ export default function AIInputSection({
         if (!messageVal && selectedImages.length === 0) return
 
         let preview: { type: "input_image", image_url: string }[] | null = null
-        if (isVisionEnabled)
+        if (isVisionEnabled) {
             preview = selectedImages.map(({ preview }) => ({ type: "input_image", image_url: preview }))
+            if (handleAyudaIa)
+                handleAyudaIa((prev) => ({ ...prev, imageUrl: preview?.length ? preview.map(p => p.image_url) : [] }))
+        }
 
         const newMessage: Message = {
             role: 'user',
@@ -222,7 +217,7 @@ export default function AIInputSection({
                 {/* Animated Loading Bar (Only visible when loading) */}
                 {isLoading && (
                     <div className="absolute overflow-hidden px-4 md:px-6 top-0 left-0 right-0 size-full rounded-4xl">
-                        <div className="absolute px-4 md:px-6 top-0 left-0 right-0 h-[2px] bg-linear-to-r from-transparent via-blue-500 to-transparent animate-shimmer z-10"></div>
+                        <div className="absolute px-4 md:px-6 top-0 left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-blue-500 to-transparent animate-shimmer z-10"></div>
                     </div>
                 )}
 
@@ -279,7 +274,7 @@ export default function AIInputSection({
                                         : 'opacity-0 translate-y-4 scale-95 pointer-events-none'
                                     }
                                             `}>
-                                    <div className="p-2 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl flex flex-col gap-2 min-w-[140px]">
+                                    <div className="p-2 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl flex flex-col gap-2 min-w-35">
                                         {/* Vision Toggle */}
                                         <button
                                             type="button"

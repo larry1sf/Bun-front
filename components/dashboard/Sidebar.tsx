@@ -1,14 +1,14 @@
 'use client';
 
-import Link from 'next/link';
 import { useState } from 'react';
 import { Ellipsis, LogOut, User, MessageSquare, Plus, PanelLeftClose, Store, Download, Image, Copy, Trash2 } from 'lucide-react';
 import { User as UserType } from '@/types';
 import { useChat } from '@/components/context/contextInfoChat';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { GalleryModal } from '@/components/dashboard/GalleryModal';
-import { useRouter } from 'next/navigation';
 import { DropdownMenu } from '@/components/ui/DropdownMenu';
+import { useRouter } from 'next/navigation';
+import { useTienda } from '@/components/context/contextInfoTienda';
 
 interface SidebarItemProps {
     id: string;
@@ -25,25 +25,31 @@ interface SidebarItemProps {
 }
 
 export const SidebarItem = ({
+    id,
     icon,
     label,
-    active = false,
-    onClick,
-    className = "",
     isOpen,
+    active = false,
+    className = "",
+    onClick,
     onDelete,
     onExportJson,
     onCopyLastMessage,
-    onGallery
+    onGallery,
 }: SidebarItemProps) => {
     const router = useRouter()
+    const { currentConversationId } = useChat()
     const handleLinkClick = () => {
+
+        if (currentConversationId === id) return
         onClick?.()
-        router.push(`/dashboard`)
+
+        const path = window.location.pathname
+        if (path.includes("/dashboard/")) router.push("/dashboard")
     }
 
     return (
-        <section
+        <div
             onClick={handleLinkClick}
             className={`outline-transparent border  group flex items-center space-x-3 ${!isOpen ? "px-2 py-1.5 justify-center" : "px-4 py-3"} rounded-lg transition-all duration-200 relative ${active
                 ? 'bg-blue-600/20 text-blue-400 border-blue-500/30'
@@ -91,7 +97,7 @@ export const SidebarItem = ({
                     ]}
                 />
             )}
-        </section>
+        </div>
     );
 };
 
@@ -109,12 +115,14 @@ export const Sidebar = ({ isOpen, setOpen, onLogout, user, children }: SidebarPr
     const [galleryConversationTitle, setGalleryConversationTitle] = useState<string>("");
 
     const { conversations, currentConversationId, loadConversation, createNewChat, deleteConversation, isConversationsLoading } = useChat();
+    const { getNumeroProductos, getFilters } = useTienda()
 
-    // No longer needed at this level
+    const router = useRouter()
 
     const handleUserInfoClick = () => {
-        // Aquí puedes agregar la lógica para mostrar información del usuario
-        console.log('Mostrar información del usuario');
+        const path = window.location.pathname
+        const pathGoal = "/dashboard/info-user"
+        if (path !== pathGoal) router.push(pathGoal)
     };
 
     const handleLogoutClick = () => {
@@ -122,8 +130,29 @@ export const Sidebar = ({ isOpen, setOpen, onLogout, user, children }: SidebarPr
     };
 
     const goEccomerceManager = () => {
-        // Navegación automática mediante Link
+        const path = window.location.pathname
+        const pathGoal = "/dashboard/eccomerce-moncada"
+        if (path !== pathGoal) {
+            router.push(pathGoal)
+
+            setTimeout(() => { createNewChat() }, 500);
+            getNumeroProductos()
+            getFilters()
+        }
+
+
+
     };
+
+    const goNewChatManager = () => {
+        const path = window.location.pathname
+        const pathGoal = "/dashboard"
+        if (currentConversationId === null && path !== pathGoal) {
+            router.push(pathGoal)
+        }
+
+        createNewChat()
+    }
 
     return (
         <aside className={`${isOpen ? 'w-72' : 'w-20'} bg-slate-950/50 border-r border-slate-900 transition-all duration-500 flex flex-col p-4 z-10 h-screen`}>
@@ -144,17 +173,16 @@ export const Sidebar = ({ isOpen, setOpen, onLogout, user, children }: SidebarPr
             </header>
 
             {/* Eccomerce actions */}
-            <Link
-                href="/dashboard/eccomerce-moncada"
+            <button
                 onClick={goEccomerceManager}
                 className={`cursor-pointer flex items-center justify-center space-x-2 mb-4 p-3 rounded-lg transition-all duration-300 group shadow-lg bg-blue-600 hover:bg-blue-500 shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-white border border-blue-400/20 *: ${!isOpen ? 'w-8 h-8 self-center px-0' : 'w-full'}`}
             >
                 <Store size={24} className={`transition-transform duration-300 `} />
                 {isOpen && <span className="text-sm font-bold text-white tracking-wide">Tienda Moncada</span>}
-            </Link>
+            </button>
             {/* New Chat Button */}
             <button
-                onClick={createNewChat}
+                onClick={goNewChatManager}
                 className={`cursor-pointer flex items-center justify-center space-x-2 mb-4 p-3 rounded-lg transition-all duration-300 group shadow-lg ${!isOpen ? 'w-8 h-8 self-center px-0' : 'w-full'} bg-blue-600 hover:bg-blue-500 shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-white border border-blue-400/20`}
             >
                 <Plus className={`transition-transform duration-300 ${isOpen ? 'group-hover:rotate-90' : ''}`} size={24} strokeWidth={2.5} />
@@ -186,10 +214,14 @@ export const Sidebar = ({ isOpen, setOpen, onLogout, user, children }: SidebarPr
                                 icon={<MessageSquare size={18} />}
                                 label={conv.title}
                                 active={currentConversationId === conv.id}
-                                onClick={() => loadConversation(conv.id)}
+                                onClick={() => {
+                                    if (currentConversationId === conv.id) return
+                                    loadConversation(conv.id)
+                                }}
                                 isOpen={isOpen}
                                 onDelete={() => setConversationToDelete(conv.id)}
                                 onExportJson={() => {
+                                    if (currentConversationId === conv.id) return
                                     fetch(`/api/dashboard/conversation?id=${conv.id}`, { credentials: "include" })
                                         .then(res => res.json())
                                         .then(data => {
@@ -204,6 +236,7 @@ export const Sidebar = ({ isOpen, setOpen, onLogout, user, children }: SidebarPr
                                         .catch(err => console.error("Export failed", err));
                                 }}
                                 onCopyLastMessage={() => {
+                                    if (currentConversationId === conv.id) return
                                     fetch(`/api/dashboard/conversation?id=${conv.id}`, { credentials: "include" })
                                         .then(res => res.json())
                                         .then(data => {
@@ -229,14 +262,14 @@ export const Sidebar = ({ isOpen, setOpen, onLogout, user, children }: SidebarPr
                     )}
                 </div>
 
-                <div className="pt-4 mt-4 border-t border-slate-900/50">
-                    {/* <SidebarItem
+                {/* <div className="pt-4 mt-4 border-t border-slate-900/50">
+                    <SidebarItem
                         icon="e"
                         label="Nada aun"
                         className="hover:bg-red-500/10 hover:text-red-400 text-sm py-2"
                         isOpen={isOpen}
-                    /> */}
-                </div>
+                    />
+                </div> */}
             </nav>
 
             <div className="mt-auto px-2 py-4 border-t border-slate-900 relative">

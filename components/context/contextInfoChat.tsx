@@ -116,4 +116,9 @@ export const ChatProvider = ({ initialValue, children }: { initialValue: Message
     )
 }
 
-export const useChat = () => useContext(ChatContext)
+export const useChat = () => {
+    const context = useContext(ChatContext)
+
+    if (context === undefined) throw new Error("No puedes usar useChat fuera del ChatProvider")
+    return context
+}

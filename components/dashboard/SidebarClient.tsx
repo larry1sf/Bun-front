@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { Sidebar } from '@/components/dashboard/Sidebar'
 import { useUser } from '@/components/context/contextInfoUser'
 import { ChatProvider } from '@/components/context/contextInfoChat'
+import { TiendaProvider } from '@/components/context/contextInfoTienda'
 
 
 export default function SidebarClient({ children }: { children: React.ReactNode }) {
@@ -30,15 +31,17 @@ export default function SidebarClient({ children }: { children: React.ReactNode 
 
     return (
         <ChatProvider initialValue={null}>
-            <Sidebar
-                isOpen={isSidebarOpen}
-                setOpen={setSidebarOpen}
-                onLogout={handleLogout}
-                user={user}
-            />
-            <div className={`flex-1 flex flex-col relative bg-slate-950/20 h-screen overflow-hidden ${isSidebarOpen ? 'opacity-0 md:opacity-100' : 'opacity-100'} `}>
-                {children}
-            </div>
+            <TiendaProvider>
+                <Sidebar
+                    isOpen={isSidebarOpen}
+                    setOpen={setSidebarOpen}
+                    onLogout={handleLogout}
+                    user={user}
+                />
+                <div className={`flex-1 flex flex-col relative bg-slate-950/20 h-screen overflow-hidden ${isSidebarOpen ? 'opacity-0 md:opacity-100' : 'opacity-100'} `}>
+                    {children}
+                </div>
+            </TiendaProvider>
         </ChatProvider>
     )
 }

@@ -26,4 +26,8 @@ export const UserProvider = ({ initialValue, children }: { initialValue: User; c
     )
 }
 
-export const useUser = () => useContext(UserContext)
+export const useUser = () => {
+    const context = useContext(UserContext)
+    if (context === undefined) throw new Error("No puedes user el useUser fuera del UserProvider")
+    return context
+}

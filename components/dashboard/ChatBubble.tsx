@@ -54,7 +54,7 @@ export default function ChatBubble() {
     )
 }
 
-function ChatBubbleAI({ message }: { message: string }) {
+export function ChatBubbleAI({ message }: { message: string }) {
     return (
         <div className="flex items-start space-x-4">
             <div className="hidden w-8 h-8 rounded-lg bg-blue-600 shrink-0 md:flex items-center justify-center text-xs font-bold text-white shadow-lg">M</div>
@@ -71,7 +71,7 @@ function ChatBubbleAI({ message }: { message: string }) {
     )
 }
 
-function ChatBubbleUser({ message, image_url }: { message?: string, image_url?: string }) {
+export function ChatBubbleUser({ message, image_url }: { message?: string, image_url?: string }) {
     const { user } = useUser()
     return (
         <div className="flex items-start flex-row-reverse space-x-4 space-x-reverse">
@@ -93,7 +93,7 @@ function ChatBubbleUser({ message, image_url }: { message?: string, image_url?: 
     )
 }
 
-function ChatBubbleLoading() {
+export function ChatBubbleLoading() {
     return (
         <div className="flex items-start space-x-4">
             <div className="w-8 h-8 rounded-lg bg-blue-600 shrink-0 flex items-center justify-center text-xs font-bold text-white shadow-lg">M</div>

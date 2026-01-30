@@ -29,7 +29,19 @@ export interface tform {
     categoria: string,
     genero: string,
     clothing_type: string,
+    descripcion?: string,
+    precio?: number,
+    color?: string[],
+    talla?: string[],
     price_min: number,
     price_max: number,
     sort: "" | "price_asc" | "price_desc" | "newest"
+}
+export type valuesOptionsFilters = {
+    value: string, label: string
+}
+export type optionsFilters = {
+    clothingType: valuesOptionsFilters[],
+    categorias: valuesOptionsFilters[],
+    genero: valuesOptionsFilters[]
 }

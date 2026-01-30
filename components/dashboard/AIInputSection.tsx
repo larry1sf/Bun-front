@@ -1,22 +1,39 @@
 import { Message, tform } from "@/types"
 import { X, Check, Paperclip, Plus, Images } from "lucide-react"
 import { useState, useRef, ChangeEvent } from "react"
-import { useChat } from "../context/contextInfoChat"
-import { useDropDown } from "../hooks/dropDown"
-import { ChatSendButton } from "./ChatSendButton"
+import { useChat } from "@/components/context/contextInfoChat"
+import { useDropDown } from "@/components/hooks/dropDown"
+import { ChatSendButton } from "@/components/dashboard/ChatSendButton"
 
 interface ImageFile {
     file: File;
     preview: string;
 }
 
-
-export default function AIInputSection({ handleAyudaIa, setStateToast }: {
+interface PropsAIInputSection {
     setStateToast: ({ message, variant }: { message: string, variant: "success" | "error" | "info" | "loading" }) => void
+    isCreateMode?: boolean
     handleAyudaIa?: (ayudaIa: (tform | ((prev: tform) => tform))) => void
-}) {
+    setExternalMessages?: (messages: Message[] | ((prev: Message[]) => Message[])) => void
+    externalIsLoading?: boolean
+    setExternalIsLoading?: (loading: boolean) => void
+}
+
+export default function AIInputSection({
+    handleAyudaIa,
+    setStateToast,
+    setExternalMessages,
+    setExternalIsLoading,
+    externalIsLoading,
+    isCreateMode
+}: PropsAIInputSection) {
     // contexto
-    const { isLoading, message, setIsLoading, setMessages, setMessage } = useChat()
+    const chatContext = useChat()
+    const { isLoading: contextLoading, message, setIsLoading: setContextLoading, setMessages: setContextMessages, setMessage } = chatContext
+    // chat mensajes externo
+    const isLoading = externalIsLoading ?? contextLoading
+    const setIsLoading = setExternalIsLoading ?? setContextLoading
+    const setMessages = setExternalMessages ?? setContextMessages
     // estados
     const [selectedImages, setSelectedImages] = useState<ImageFile[]>([])
     const [isVisionEnabled, setIsVisionEnabled] = useState(false)
@@ -73,12 +90,16 @@ export default function AIInputSection({ handleAyudaIa, setStateToast }: {
         const controller = new AbortController();
         abortControllerRef.current = controller;
 
-        fetch('/api/buscar-productos/ia', {
+
+        const opcionesFiltros = JSON.parse(localStorage.getItem("opcionesFiltros") || "{}")
+        const url = !!isCreateMode ? '/api/crear-productos/ia' : '/api/buscar-productos/ia'
+        fetch(url, {
             method: 'POST',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 messages: [message],
+                opcionesFiltros,
                 visionEnabled: isVisionEnabled
             }),
             signal: controller.signal
@@ -93,37 +114,47 @@ export default function AIInputSection({ handleAyudaIa, setStateToast }: {
             })
             .then(data => {
                 if (!data?.respuesta) throw new Error("La IA no devolvió una respuesta válida");
-
-                const responseText = data.respuesta;
-                const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-                if (!jsonMatch) throw new Error("No se pudo interpretar la sugerencia de la IA");
-
                 try {
-                    const parsedData = JSON.parse(jsonMatch[0]);
-                    const normalized: Partial<tform> = {};
+                    const { data: dataIa, message } = JSON.parse(data?.respuesta)
+                    const parsedData = Array.isArray(dataIa) ? dataIa[0] : dataIa
+                    const messageIa = message ?? ""
+
+                    const normalized: Partial<tform> = {}
 
                     // Mapeo inteligente de llaves
-                    if (parsedData.name || parsedData.nombre) normalized.name = parsedData.name || parsedData.nombre;
-                    if (parsedData.categoria || parsedData.category) normalized.categoria = parsedData.categoria || parsedData.category;
-                    if (parsedData.genero || parsedData.gender) normalized.genero = parsedData.genero || parsedData.gender;
-                    if (parsedData.clothing_type || parsedData.tipo_ropa || parsedData.clothingType)
-                        normalized.clothing_type = parsedData.clothing_type || parsedData.tipo_ropa || parsedData.clothingType;
+                    if (parsedData.name) normalized.name = parsedData.name || "";
+                    if (parsedData.categoria) normalized.categoria = parsedData.categoria || "";
+                    if (parsedData.genero) normalized.genero = parsedData.genero || "";
+                    if (parsedData.clothing_type) normalized.clothing_type = parsedData.clothing_type || "";
+                    if (parsedData.description) normalized.descripcion = parsedData.description || "";
+                    if (parsedData.price) normalized.precio = parsedData.price || 0;
+                    if (parsedData.color) normalized.color = parsedData.color || [];
+                    if (parsedData.size) normalized.talla = parsedData.size || [];
 
-                    if (Object.keys(normalized).length === 0) throw new Error("No se encontró información relevante");
-
-                    return normalized;
+                    return { normalized, messageIa };
                 } catch (e) {
                     throw new Error("Formato de sugerencia inválido");
                 }
             })
-            .then(res => {
+            .then(({ normalized, messageIa }) => {
                 if (handleAyudaIa) {
-                    handleAyudaIa((prev: tform) => ({ ...prev, ...res }));
+                    handleAyudaIa((prev: tform) => ({ ...prev, ...normalized }));
                     setStateToast({ message: "Sugerencia aplicada con éxito", variant: "success" });
                 }
+                if (setExternalMessages) setExternalMessages(prevMsg => {
+                    return [...prevMsg, {
+                        role: "assistant",
+                        content: [{ type: "text", text: messageIa }]
+                    }]
+                })
             })
             .catch((error) => {
-                if (error.name === 'AbortError') return;
+                if (error.name === 'AbortError') {
+                    console.log("abortamos");
+                    if (setMessages) setMessages(prevMsg => prevMsg.slice(0, -1))
+                    if (setExternalMessages) setExternalMessages(prevMsg => prevMsg.slice(0, -1))
+                    return
+                };
 
                 console.error('AI Error:', error);
                 setStateToast({
